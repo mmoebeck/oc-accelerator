@@ -47,7 +47,7 @@ export const removeAllPayments = createOcAsyncThunk<undefined, undefined>(
     const queue: Promise<any>[] = [];
     if (ocCurrentOrder.payments) {
       ocCurrentOrder.payments.forEach((p) => {
-        queue.push(Payments.Delete('Outgoing', ocCurrentOrder.order.ID, p.ID));
+        queue.push(Payments.Delete('Outgoing', ocCurrentOrder?.order.ID, p.ID));
       });
     }
     await Promise.all(queue);
@@ -81,7 +81,7 @@ export const retrieveOrder = createOcAsyncThunk<RequiredDeep<OrderWorksheet> | u
       sortBy: ['!DateCreated'],
       filters: { Status: 'Unsubmitted' },
     });
-
+// debugger
     const firstOrder = response.Items[0];
     //console.log("grabbing first order: " + firstOrder.ID)
 

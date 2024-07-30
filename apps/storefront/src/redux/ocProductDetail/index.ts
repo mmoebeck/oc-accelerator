@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, SerializedError } from '@reduxjs/toolkit'
-import { appConfig } from 'components/appConfig/config'
+// import { appConfig } from 'components/appConfig/config'
 import { BuyerProduct, Me, RequiredDeep, Spec, Variant } from 'ordercloud-javascript-sdk'
 import { cacheProduct, ocProductCacheSelectors } from '../ocProductCache'
 import { createOcAsyncThunk } from '../ocReduxHelpers'
@@ -36,7 +36,7 @@ export const setProductId = createAsyncThunk<RequiredDeep<BuyerProduct>, string,
     let product = ocProductCacheSelectors.selectById(ThunkAPI.getState(), productId)
 
     if (!product) {
-      product = await Me.GetProduct(productId, { sellerID: appConfig.MarketplaceOwnerID })
+      product = await Me.GetProduct(productId, { sellerID: 'id' })
       ThunkAPI.dispatch(cacheProduct(product))
     }
 

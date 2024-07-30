@@ -1,10 +1,10 @@
 import { DecodedToken, Tokens } from 'ordercloud-javascript-sdk'
-import parseJwt from 'src/utils/parseJwt'
 import { clearCurrentOrder, retrieveOrder } from '../ocCurrentOrder'
 import { cleanProductCache } from '../ocProductCache'
 import { clearProductList } from '../ocProductList'
 import { createOcAsyncThunk } from '../ocReduxHelpers'
 import { clearUser, getUser } from '../ocUser'
+import parseJwt from '../../utils/parseJwt'
 
 const impersonate = createOcAsyncThunk<DecodedToken, string>(
   'ocAuth/impersonate',

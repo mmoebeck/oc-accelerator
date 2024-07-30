@@ -1,7 +1,7 @@
 import { RouteObject } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import Layout from "./components/Layout";
-import { NotFoundPage } from "./404";
+import { ShoppingCart } from "./components/ShoppingCart";
 
 const routes: RouteObject[] = [
   {
@@ -12,11 +12,11 @@ const routes: RouteObject[] = [
         path: "/",
         element: <Dashboard />,
       },
+      {
+        path: "/cart",
+        element: <ShoppingCart />,
+      },
     ],
-  },
-  {
-    path: "*",
-    element: <NotFoundPage />,
   },
 ];
 
