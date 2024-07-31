@@ -17,11 +17,9 @@ import { useCallback, useEffect, useState } from "react";
 import formatPrice from "../utils/formatPrice";
 import OcCurrentOrderLineItemList from "./OcCurrentOrderLineItemList";
 import {
+  Cart,
   LineItem,
-  LineItems,
-  Me,
   Order,
-  Orders,
   RequiredDeep,
 } from "ordercloud-javascript-sdk";
 import { useNavigate } from "react-router-dom";
@@ -32,24 +30,19 @@ export const ShoppingCart = (): JSX.Element => {
   const navigate = useNavigate();
 
   const getOrder = useCallback(async () => {
-    const result = await Me.ListOrders({
-      sortBy: ["!DateCreated"],
-      filters: { Status: "Unsubmitted" },
-    });
-
-    if (result.Items?.length) setOrder(result.Items[0]);
+    const result = await Cart.Get()
+setOrder(result)
   }, []);
 
   const getLineItems = useCallback(async () => {
     if (!order?.ID) return;
-    const result = await LineItems.List("Outgoing", order.ID);
-
-    if (result.Items?.length) setLineItems(result.Items);
+    const result = await Cart.ListLineItems()
+    setLineItems(result.Items);
   }, [order]);
 
   const deleteOrder = useCallback(async () => {
     if (!order?.ID) return;
-    await Orders.Delete("Outgoing", order.ID);
+    await Cart.Delete();
 
     setOrder(undefined);
     setLineItems(undefined);
@@ -58,10 +51,10 @@ export const ShoppingCart = (): JSX.Element => {
   const submitOrder = useCallback(async () => {
     if (!order?.ID) return;
     try {
-      await Orders.Submit("Outgoing", order.ID);
+      await Cart.Submit();
       navigate("/order-summary");
-    } catch {
-      debugger;
+    } catch (err) {
+      console.log(err)
     }
   }, [navigate, order?.ID]);
 
