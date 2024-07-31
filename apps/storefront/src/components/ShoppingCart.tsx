@@ -38,14 +38,14 @@ export const ShoppingCart = (): JSX.Element => {
   const { isOpen, onClose, onToggle } = useDisclosure();
   const { order, lineItems } = useOcCurrentOrder();
   // debugger
-  const [currentCheckoutPath, setCurrentCheckoutPath] = useState("/check-out");
+  const [currentCheckoutPath, setCurrentCheckoutPath] = useState("/checkout");
 
-  useEffect(() => {
-    const cookies = new Cookies();
-    if (cookies.get("currentcheckoutflow") !== null) {
-      setCurrentCheckoutPath(cookies.get("currentcheckoutflow"));
-    }
-  }, []);
+  // useEffect(() => {
+  //   const cookies = new Cookies();
+  //   if (cookies.get("currentcheckoutflow") !== null) {
+  //     setCurrentCheckoutPath(cookies.get("currentcheckoutflow"));
+  //   }
+  // }, []);
 
   const handleOrderComments = () => {
     onClose();
