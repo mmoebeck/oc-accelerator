@@ -1,19 +1,20 @@
 import { FunctionComponent } from 'react'
 import OcLineItemList from './OcLineItemList'
-import useOcCurrentOrder from '../hooks/useOcCurrentOrder'
+import { LineItem } from 'ordercloud-javascript-sdk'
 
 interface OcCurrentOrderLineItemListProps {
   emptyMessage?: string
   editable?: boolean
   productType?: string
+  lineItems?: LineItem[]
 }
 
 const OcCurrentOrderLineItemList: FunctionComponent<OcCurrentOrderLineItemListProps> = ({
   emptyMessage,
   editable,
   productType,
+  lineItems
 }) => {
-  const { lineItems } = useOcCurrentOrder()
   let productItems = lineItems
   if (productType != null) {
     productItems = lineItems?.filter(function (p) {

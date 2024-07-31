@@ -5,55 +5,56 @@ import {
   ButtonGroup,
   Card,
   CardBody,
-  Collapse,
   HStack,
   Heading,
   Hide,
-  IconButton,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Link,
   SimpleGrid,
   Stack,
   Text,
-  Textarea,
   VStack,
-  useDisclosure,
 } from "@chakra-ui/react";
-
-import { Form, Formik } from "formik";
-// import NextLink from 'next/link'
-import { useEffect, useState } from "react";
-import { MdEditNote } from "react-icons/md";
-import Cookies from "universal-cookie";
-import useOcCurrentOrder from "../hooks/useOcCurrentOrder";
-import { useOcDispatch } from "../redux/ocStore";
+import { useCallback, useEffect, useState } from "react";
 import formatPrice from "../utils/formatPrice";
-import { deleteCurrentOrder } from "../redux/ocCurrentOrder";
 import OcCurrentOrderLineItemList from "./OcCurrentOrderLineItemList";
+import { LineItem, LineItems, Me, Order, Orders, RequiredDeep } from "ordercloud-javascript-sdk";
 
 export const ShoppingCart = (): JSX.Element => {
-  const dispatch = useOcDispatch();
-  const { isOpen, onClose, onToggle } = useDisclosure();
-  const { order, lineItems } = useOcCurrentOrder();
-  // debugger
-  const [currentCheckoutPath, setCurrentCheckoutPath] = useState("/check-out");
+  const [lineItems, setLineItems] = useState<LineItem[]>()
+  const [order, setOrder] = useState<RequiredDeep<Order>>()
 
-  useEffect(() => {
-    const cookies = new Cookies();
-    if (cookies.get("currentcheckoutflow") !== null) {
-      setCurrentCheckoutPath(cookies.get("currentcheckoutflow"));
-    }
-  }, []);
+  const getOrder = useCallback(async ()=> {
+    const result = await Me.ListOrders({
+      sortBy: ['!DateCreated'],
+      filters: { Status: 'Unsubmitted' },
+    });
 
-  const handleOrderComments = () => {
-    onClose();
-  };
+    if(result.Items?.length)
+    setOrder(result.Items[0])
+  },[])
 
-  function setSubmitting(_value: string) {
-    console.log("work-in-progress. it will save to order.Comments");
-  }
+  const getLineItems = useCallback(async ()=> {
+    if(!order?.ID) return 
+    const result = await LineItems.List('Outgoing', order.ID);
+
+    if(result.Items?.length)
+    setLineItems(result.Items)
+  },[order])
+
+  const deleteOrder = useCallback(async ()=> {
+    if(!order?.ID) return 
+    await Orders.Delete('Outgoing', order.ID);
+
+    setOrder(undefined)
+    setLineItems(undefined)
+  },[order])
+
+  useEffect(()=> {
+    getOrder()
+  },[getOrder])
+
+  useEffect(()=> {
+    getLineItems()
+  },[order, getLineItems])
 
   return (
     <SimpleGrid
@@ -83,7 +84,7 @@ export const ShoppingCart = (): JSX.Element => {
           {lineItems?.length !== 0 && (
             <Button
               type="button"
-              onClick={() => dispatch(deleteCurrentOrder())}
+              onClick={deleteOrder}
               variant="outline"
               alignSelf="flex-end"
               size="xs"
@@ -95,6 +96,7 @@ export const ShoppingCart = (): JSX.Element => {
         {lineItems?.length !== 0 ? (
           <VStack gap={6} w="100%" width="full" alignItems="flex-end">
             <OcCurrentOrderLineItemList
+              lineItems={lineItems}
               emptyMessage="Your cart is empty"
               editable
             />
@@ -144,106 +146,17 @@ export const ShoppingCart = (): JSX.Element => {
                 </Text>
               </Heading>
             )}
-
-            <Hide above="md">
-              <IconButton
-                variant="outline"
-                size="sm"
-                fontSize="1.15em"
-                onClick={onToggle}
-                aria-label="add order comments"
-                icon={<MdEditNote />}
-              />
-              <Card mt="-3" as={Collapse} in={isOpen} animateOpacity>
-                <Formik
-                  initialValues={{ search: "" }}
-                  onSubmit={async (values) => {
-                    setSubmitting(values.search);
-                  }}
-                >
-                  <Form>
-                    <InputGroup>
-                      <Input
-                        as={Textarea}
-                        variant="outline"
-                        placeholder="e.g. Delivery instructions"
-                      />
-                      <InputRightElement mr="2">
-                        <Button
-                          size="xs"
-                          fontSize=".8em"
-                          onClick={handleOrderComments}
-                          type="submit"
-                        >
-                          Save
-                        </Button>
-                      </InputRightElement>
-                    </InputGroup>
-                  </Form>
-                </Formik>
-              </Card>
-            </Hide>
             <ButtonGroup w="full" as={VStack} alignItems="flex-start">
-              <Hide below="md">
                 <Button
-                  variant="ghost"
-                  colorScheme="neutral"
-                  size="xs"
-                  onClick={onToggle}
-                >
-                  Add order comments
-                </Button>
-                <Card
-                  variant="unstyled"
-                  as={Collapse}
-                  in={isOpen}
-                  animateOpacity
-                >
-                  {/* TODO: finish adding order comments */}
-                  <Formik
-                    initialValues={{ search: "" }}
-                    onSubmit={async (values) => {
-                      setSubmitting(values.search);
-                    }}
-                  >
-                    <Form>
-                      <InputGroup>
-                        <Input
-                          as={Textarea}
-                          variant="outline"
-                          placeholder="e.g. Delivery instructions"
-                        />
-                        <InputRightElement mr="2">
-                          <Button
-                            size="xs"
-                            fontSize=".8em"
-                            onClick={handleOrderComments}
-                            type="submit"
-                          >
-                            Save
-                          </Button>
-                        </InputRightElement>
-                      </InputGroup>
-                    </Form>
-                  </Formik>
-                </Card>
-              </Hide>
-              <Link
-                style={{ width: "100%", marginTop: "auto" }}
-                href={currentCheckoutPath}
-                // passHref
-              >
-                <Button
-                  as={Link}
+                  onClick={()=> console.log('submit')}
                   size={{ base: "sm", lg: "lg" }}
                   fontSize="lg"
                   colorScheme="green"
                   w={{ lg: "full" }}
                   _hover={{ textDecoration: "none" }}
                 >
-                  Proceed to checkout
+                  Submit Order
                 </Button>
-              </Link>
             </ButtonGroup>
           </CardBody>
         </Card>

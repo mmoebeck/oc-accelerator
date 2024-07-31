@@ -9,7 +9,7 @@ import OcLineItemCard from './OcLineItemCard'
 interface OcLineItemListProps {
   emptyMessage?: string
   editable?: boolean
-  lineItems: LineItem[]
+  lineItems?: LineItem[]
 }
 
 const OcLineItemList: FunctionComponent<OcLineItemListProps> = ({
@@ -23,7 +23,7 @@ const OcLineItemList: FunctionComponent<OcLineItemListProps> = ({
       alignItems="flex-start"
       w="full"
     >
-      {lineItems.map((li) => (
+      {lineItems?.map((li) => (
         <React.Fragment key={li.ID}>
           <OcLineItemCard
             lineItem={li}
