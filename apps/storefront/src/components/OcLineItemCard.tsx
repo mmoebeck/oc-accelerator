@@ -139,70 +139,19 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({ lineItem, edit
             spacing="3"
             alignItems="center"
           >
-            {/* TODO: determine if we are adding delivery instructions via line item or via order comments */}
-            {/* <Button
-              type="button"
-              variant="link"
-              size="xs"
-              fontSize=".7em"
-              colorScheme="neutral"
-              onClick={() => setIsDeliveryInstructionsModalOpen(true)}
-            >
-              Add Delivery Instructions
-            </Button>
-            <Text
-              fontWeight="200"
-              pb="3px"
-              color="chakra-border-color"
-            >
-              |
-            </Text> */}
-            {editable && (
-              <Button
-                type="button"
-                variant="link"
-                size="xs"
-                fontSize=".7em"
-                colorScheme="danger"
-                onClick={handleRemoveLineItem}
-              >
-                Remove
-              </Button>
-            )}
           </ButtonGroup>
         </VStack>
         {editable ? (
           <>
-            {/* <HStack justifyContent="flex-end">
-             <Link href={`/products/${lineItem.ProductID}?lineitem=${lineItem.ID}`}>
-            <a aria-label="Edit Line Item">Edit</a>
-          </Link>
-          </HStack> */}
             {product && (
               <VStack
                 alignItems="flex-start"
                 ml="auto"
                 as="form"
-                onSubmit={handleUpdateLineItem}
+                // onSubmit={handleUpdateLineItem}
               >
-                <OcQuantityInput
-                  controlId={`${lineItem.ID}_quantity`}
-                  quantity={quantity}
-                  disabled={disabled}
-                  onChange={setQuantity}
-                  priceSchedule={product.PriceSchedule}
-                />
-                <Button
-                  type="submit"
-                  aria-label="Update Line Item Quantity"
-                  variant="link"
-                  size="xs"
-                  fontSize=".7em"
-                  colorScheme="neutral"
-                  disabled={disabled}
-                >
-                  Update quantity
-                </Button>
+                <Text>Quantity</Text>
+                <Text>{quantity}</Text>
               </VStack>
             )}
           </>
