@@ -6,18 +6,21 @@ import {
   GridItem,
   HStack,
   Heading,
+  Icon,
+  IconButton,
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
 import { FC, useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import LoginModal from "./LoginModal";
 import { APP_NAME } from "../constants";
 import { useCurrentUser } from "../hooks/currentUser";
+import { TbLink, TbShoppingCart } from "react-icons/tb";
 
 const Layout: FC = () => {
-  const {data:user} = useCurrentUser();
+  const { data: user } = useCurrentUser();
 
   const { allowAnonymous, isAuthenticated, isLoggedIn, logout } =
     useOrderCloudContext();
@@ -55,6 +58,14 @@ const Layout: FC = () => {
                     ? `Welcome, ${user?.FirstName} ${user?.LastName}`
                     : "Welcome"}
                 </Heading>
+                <Link to={"/cart"}>
+                  <IconButton
+                  size="lg"
+                    icon={<Icon as={TbShoppingCart} />}
+                    variant="unstyled"
+                    aria-label={`Link to cart`}
+                  />
+                </Link>
                 {isLoggedIn ? (
                   <Button size="sm" onClick={logout}>
                     Logout

@@ -16,45 +16,62 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import formatPrice from "../utils/formatPrice";
 import OcCurrentOrderLineItemList from "./OcCurrentOrderLineItemList";
-import { LineItem, LineItems, Me, Order, Orders, RequiredDeep } from "ordercloud-javascript-sdk";
+import {
+  LineItem,
+  LineItems,
+  Me,
+  Order,
+  Orders,
+  RequiredDeep,
+} from "ordercloud-javascript-sdk";
+import { useNavigate } from "react-router-dom";
 
 export const ShoppingCart = (): JSX.Element => {
-  const [lineItems, setLineItems] = useState<LineItem[]>()
-  const [order, setOrder] = useState<RequiredDeep<Order>>()
+  const [lineItems, setLineItems] = useState<LineItem[]>();
+  const [order, setOrder] = useState<RequiredDeep<Order>>();
+  const navigate = useNavigate();
 
-  const getOrder = useCallback(async ()=> {
+  const getOrder = useCallback(async () => {
     const result = await Me.ListOrders({
-      sortBy: ['!DateCreated'],
-      filters: { Status: 'Unsubmitted' },
+      sortBy: ["!DateCreated"],
+      filters: { Status: "Unsubmitted" },
     });
 
-    if(result.Items?.length)
-    setOrder(result.Items[0])
-  },[])
+    if (result.Items?.length) setOrder(result.Items[0]);
+  }, []);
 
-  const getLineItems = useCallback(async ()=> {
-    if(!order?.ID) return 
-    const result = await LineItems.List('Outgoing', order.ID);
+  const getLineItems = useCallback(async () => {
+    if (!order?.ID) return;
+    const result = await LineItems.List("Outgoing", order.ID);
 
-    if(result.Items?.length)
-    setLineItems(result.Items)
-  },[order])
+    if (result.Items?.length) setLineItems(result.Items);
+  }, [order]);
 
-  const deleteOrder = useCallback(async ()=> {
-    if(!order?.ID) return 
-    await Orders.Delete('Outgoing', order.ID);
+  const deleteOrder = useCallback(async () => {
+    if (!order?.ID) return;
+    await Orders.Delete("Outgoing", order.ID);
 
-    setOrder(undefined)
-    setLineItems(undefined)
-  },[order])
+    setOrder(undefined);
+    setLineItems(undefined);
+  }, [order]);
 
-  useEffect(()=> {
-    getOrder()
-  },[getOrder])
+  const submitOrder = useCallback(async () => {
+    if (!order?.ID) return;
+    try {
+      await Orders.Submit("Outgoing", order.ID);
+      navigate("/order-summary");
+    } catch {
+      debugger;
+    }
+  }, [navigate, order?.ID]);
 
-  useEffect(()=> {
-    getLineItems()
-  },[order, getLineItems])
+  useEffect(() => {
+    getOrder();
+  }, [getOrder]);
+
+  useEffect(() => {
+    getLineItems();
+  }, [order, getLineItems]);
 
   return (
     <SimpleGrid
@@ -147,16 +164,16 @@ export const ShoppingCart = (): JSX.Element => {
               </Heading>
             )}
             <ButtonGroup w="full" as={VStack} alignItems="flex-start">
-                <Button
-                  onClick={()=> console.log('submit')}
-                  size={{ base: "sm", lg: "lg" }}
-                  fontSize="lg"
-                  colorScheme="green"
-                  w={{ lg: "full" }}
-                  _hover={{ textDecoration: "none" }}
-                >
-                  Submit Order
-                </Button>
+              <Button
+                onClick={submitOrder}
+                size={{ base: "sm", lg: "lg" }}
+                fontSize="lg"
+                colorScheme="green"
+                w={{ lg: "full" }}
+                _hover={{ textDecoration: "none" }}
+              >
+                Submit Order
+              </Button>
             </ButtonGroup>
           </CardBody>
         </Card>
