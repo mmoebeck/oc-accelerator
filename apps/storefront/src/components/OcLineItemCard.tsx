@@ -110,6 +110,14 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({ lineItem, edit
             </Text>
             {lineItem.Product.ID}
           </Text>
+          <Text
+            mt={-3}
+            fontSize="xs"
+            color="chakra-subtle-text"
+          >
+            
+            {lineItem.Product?.xp?.Brand}
+          </Text>
           {lineItem?.Specs.map((spec) => (
             <React.Fragment key={spec.SpecID}>
               <Text
