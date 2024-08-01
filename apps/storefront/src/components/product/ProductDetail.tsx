@@ -1,67 +1,64 @@
 import {
   Button,
   Center,
-  Code,
   Heading,
   HStack,
   Icon,
   Image,
   SimpleGrid,
+  Spinner,
   Text,
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import { unwrapResult } from "@reduxjs/toolkit";
-import { BuyerProduct, Cart, Me, OrderCloudError, Product } from "ordercloud-javascript-sdk";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  BuyerProduct,
+  Cart,
+  Me,
+  OrderCloudError,
+} from "ordercloud-javascript-sdk";
+import React, { useCallback, useEffect, useState } from "react";
 import { TbPhoto } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
-// import useOcProductDetail from "../../hooks/useOcProductDetail";
-// import { createLineItem } from "../../redux/ocCurrentOrder";
-// import { useOcDispatch } from "../../redux/ocStore";
 import formatPrice from "../../utils/formatPrice";
 import OcQuantityInput from "../cart/OcQuantityInput";
-import { useOcResourceGet } from "@rwatt451/ordercloud-react";
 
 export interface ProductDetailProps {
   productId: string;
   renderProductDetail?: (product: BuyerProduct) => JSX.Element;
 }
 
-const ProductDetail: React.FC<ProductDetailProps> = ({
-  productId,
-  renderProductDetail,
-}) => {
-  // const dispatch = useOcDispatch();
+const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
   const navigate = useNavigate();
   const toast = useToast();
-  const [product, setProduct] = useState<BuyerProduct>()
-  // const query = useOcResourceGet('Products', {ID: productId})
-  // const product = useMemo(()=> query?.data,[query?.data])
-  // const { product, variants } = useOcProductDetail(productId);
+  const [product, setProduct] = useState<BuyerProduct>();
+  const [loading, setLoading] = useState<boolean>(true);
   const [addingToCart, setAddingToCart] = useState(false);
   const [quantity, setQuantity] = useState(
     product ? product.PriceSchedule.MinQuantity : 1
   );
 
-  const getProduct = useCallback(async ()=> {
-    const result = await Me.GetProduct(productId)
-    setProduct(result)
-  },[productId])
+  const getProduct = useCallback(async () => {
+    setLoading(true);
+    try {
+      const result = await Me.GetProduct(productId);
+      setProduct(result);
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+    }
+  }, [productId]);
 
-  useEffect(()=> {
-    getProduct()
-  }, [getProduct])
+  useEffect(() => {
+    getProduct();
+  }, [getProduct]);
 
   const handleAddToCart = useCallback(async () => {
     if (product) {
       try {
         setAddingToCart(true);
-        // const resultAction = await dispatch(
-        //   createLineItem({ ProductID: productId, Quantity: quantity })
-        // );
-        // unwrapResult(resultAction);
-        await Cart.CreateLineItem({ ProductID: productId, Quantity: quantity })
+        await Cart.CreateLineItem({ ProductID: productId, Quantity: quantity });
         setAddingToCart(false);
         navigate("/cart");
       } catch (error) {
@@ -90,44 +87,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
     }
   }, [product, productId, quantity, navigate, toast]);
 
-  /* const handleAddToCart = useCallback(async () => {
-    if (product) {
-      try {
-        setAddingToCart(true);
-        const resultAction = await dispatch(
-          createLineItem({ ProductID: productId, Quantity: quantity })
-        );
-        unwrapResult(resultAction);
-        setAddingToCart(false);
-        navigate("/cart");
-      } catch (error) {
-        console.error("Failed to add item to cart:", error);
-        setAddingToCart(false);
-        // You might want to show an error message to the user here
-      }
-    }
-  }, [dispatch, product, quantity, navigate]); */
-
-  /*   const handleAddToCart = useCallback(async () => {
-    if (product) {
-      setAddingToCart(true);
-      await dispatch(
-        createLineItem({ ProductID: productId, Quantity: quantity })
-      );
-      setAddingToCart(false);
-    }
-  }, [dispatch, product, quantity]); */
-
-  if (!product) {
-    console.log("Product not found for ID:", productId);
-    return <div>Product not found for ID: {productId}</div>;
-  }
-
-  console.log(product);
-
-  return renderProductDetail ? (
-    renderProductDetail(product)
-  ) : (
+  return loading ? (
+    <Spinner />
+  ) : product ? (
     <SimpleGrid gridTemplateColumns="1fr 3fr" gap={8}>
       <Center bgColor="chakra-subtle-bg" aspectRatio="1 / 1" objectFit="cover">
         {product.xp?.Images ? (
@@ -153,12 +115,6 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
             Brand: {product.xp?.Brand}
           </Text>
         )}
-        {/* {variants && (
-          <VStack alignItems="flex-start" minH="100px">
-            <Heading size="sm">Variants</Heading>
-            <Code>{JSON.stringify(variants, null, 2)}</Code>
-          </VStack>
-        )} */}
         <Text fontSize="xl">
           {formatPrice(product.PriceSchedule?.PriceBreaks[0]?.Price)}
         </Text>
@@ -185,6 +141,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
         </HStack>
       </VStack>
     </SimpleGrid>
+  ) : (
+    <div>Product not found for ID: {productId}</div>
   );
 };
 

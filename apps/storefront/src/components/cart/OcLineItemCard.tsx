@@ -56,8 +56,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
         />
         <VStack alignItems="flex-start" gap={3}>
           <Link
-            href={`product-details?productid=${lineItem?.Product?.ID}`}
-            // passHref
+            href={`products/${lineItem?.Product?.ID}`}
           >
             <Link fontSize="xl" display="inline-block" maxW="md">
               {lineItem.Product.Name}
