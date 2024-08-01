@@ -9,17 +9,19 @@ import React, {
 import ProductCard from "./ProductCard";
 export interface ProductListProps {
   renderItem?: (product: BuyerProduct) => JSX.Element;
+  catalogId?: string;
 }
 
-const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
+const ProductList: FunctionComponent<ProductListProps> = ({ renderItem, catalogId }) => {
   const [products, setProducts] = useState<BuyerProduct[]>();
 
   const getProducts = useCallback(async () => {
     const result = await Me.ListProducts({
-      filters: { "xp.Images": "*", SpecCount: 0, "xp.Brand": "*" },
+      catalogID: catalogId,
+      filters: { "xp.Images": "*", SpecCount: 0 },
     }); // do we need to support specs?
     setProducts(result?.Items);
-  }, []);
+  }, [catalogId]);
 
   useEffect(() => {
     getProducts();

@@ -24,6 +24,10 @@ const routes: RouteObject[] = [
         element: <ProductList />,
       },
       {
+        path: "/catch-catalog",
+        element: <ProductList catalogId={"catch"} />,
+      },
+      {
         path: "/products/:productId",
         element: <ProductDetailWrapper />,
       },
