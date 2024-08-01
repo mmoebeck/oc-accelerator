@@ -1,14 +1,13 @@
 import {
   Button,
-  Center,
   Container,
-  Grid,
   GridItem,
   HStack,
   Heading,
   Icon,
   IconButton,
   Text,
+  VStack,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
@@ -38,15 +37,11 @@ const Layout: FC = () => {
   return (
     <>
       <LoginModal disclosure={loginDisclosure} />
-      <Grid
-        templateAreas={`"header header"
-            "nav main"
-            "nav footer"`}
-        gridTemplateRows={"50px 1fr 50px"}
-        gridTemplateColumns={"300px 1fr"}
-        h="100vh"
-        color="blackAlpha.700"
-        fontWeight="bold"
+      <VStack
+        alignItems="flex-start"
+        w="100dvw"
+        h="100dvh"
+        sx={{ "&>*": { width: "full" } }}
       >
         <GridItem area={"header"} zIndex={2} shadow="md">
           <Container h="100%" maxW="full">
@@ -78,21 +73,23 @@ const Layout: FC = () => {
               </HStack>
             </HStack>
           </Container>
-        </GridItem>
-        <GridItem area={"nav"} zIndex={1} shadow="lg" bg="blackAlpha.100">
-          <Center h="100%">
-            <Text>Navigation</Text>
-          </Center>
-        </GridItem>
-        <GridItem area={"main"} overflowY="scroll" overflowX="hidden">
+          </GridItem>
+        {/* </HStack> */}
+        <Container maxW="container.2xl" py={8} as="main" flex="1">
           <Outlet />
-        </GridItem>
-        <GridItem as={Center} area={"footer"} bg="blackAlpha.50">
+        </Container>
+        <HStack
+          alignItems="center"
+          justifyContent="center"
+          as="footer"
+          py={3}
+          bg="blackAlpha.50"
+        >
           <Text fontWeight="normal" fontSize="sm">
             © Sitcore Inc. 2024
           </Text>
-        </GridItem>
-      </Grid>
+        </HStack>
+      </VStack>
     </>
   );
 };

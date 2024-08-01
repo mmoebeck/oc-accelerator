@@ -18,7 +18,7 @@ import {
 import { FunctionComponent, useMemo, useState } from "react";
 import { LineItem } from "ordercloud-javascript-sdk";
 import React from "react";
-import formatPrice from "../utils/formatPrice";
+import formatPrice from "../../utils/formatPrice";
 
 interface OcLineItemCardProps {
   lineItem: LineItem;

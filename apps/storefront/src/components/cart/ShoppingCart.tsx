@@ -14,7 +14,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
-import formatPrice from "../utils/formatPrice";
+import formatPrice from "../../utils/formatPrice";
 import OcCurrentOrderLineItemList from "./OcCurrentOrderLineItemList";
 import {
   Cart,
