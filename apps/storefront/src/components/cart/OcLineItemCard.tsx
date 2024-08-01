@@ -16,7 +16,13 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
-import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Cart, LineItem } from "ordercloud-javascript-sdk";
 import React from "react";
 import formatPrice from "../../utils/formatPrice";
@@ -26,43 +32,43 @@ import useDebounce from "../../hooks/useDebounce";
 interface OcLineItemCardProps {
   lineItem: LineItem;
   editable?: boolean;
-  onChange?: (newLi:LineItem) => void;
+  onChange?: (newLi: LineItem) => void;
 }
 
 const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
   lineItem,
   editable,
-  onChange
+  onChange,
 }) => {
-  const [quantity, _setQuantity] = useState(lineItem.Quantity);
-
+  const [quantity, setQuantity] = useState(lineItem.Quantity);
   const debouncedQuantity = useDebounce(quantity, 300);
-
   const product = useMemo(() => lineItem.Product, [lineItem]);
   const [isDeliveryInstructionsModalOpen, setIsDeliveryInstructionsModalOpen] =
     useState(false);
 
-
-  const updateLineItem = useCallback(async (quantity:number) => {
-    const response  = await Cart.PatchLineItem(lineItem.ID!, { Quantity: quantity });
-    if (onChange) {
-      onChange(response);
-    }
-  }, [lineItem, onChange])
+  const updateLineItem = useCallback(
+    async (quantity: number) => {
+      if (quantity !== lineItem.Quantity) {
+        const response = await Cart.PatchLineItem(lineItem.ID!, {
+          Quantity: quantity,
+        });
+        if (onChange) {
+          onChange(response);
+        }
+      }
+    },
+    [lineItem, onChange]
+  );
 
   useEffect(() => {
-    
     updateLineItem(debouncedQuantity);
-  }, [debouncedQuantity, updateLineItem])
+  }, [debouncedQuantity, updateLineItem]);
 
-
-  const lineSubtotal = useMemo(() => {
-    return formatPrice(lineItem.LineSubtotal)
-  }, [lineItem])
-
-  const unitPrice = useMemo(() => {
-    return formatPrice(lineItem.UnitPrice)
-  }, [lineItem])
+  const lineSubtotal = useMemo(
+    () => formatPrice(lineItem.LineSubtotal),
+    [lineItem]
+  );
+  const unitPrice = useMemo(() => formatPrice(lineItem.UnitPrice), [lineItem]);
 
   return (
     <>
@@ -105,30 +111,26 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
             </Text>
           </HStack>
           {lineItem?.Specs?.map((spec) => (
-            <React.Fragment key={spec.SpecID}>
-              <Text mt={-3} fontSize="xs" color="chakra-subtle-text">
-                <Text fontWeight="600" display="inline">
-                  {spec.Name}:
-                </Text>{" "}
-                {spec.Value}
-              </Text>
-            </React.Fragment>
+            <Text
+              key={spec.SpecID}
+              mt={-3}
+              fontSize="xs"
+              color="chakra-subtle-text"
+            >
+              <Text fontWeight="600" display="inline">
+                {spec.Name}:
+              </Text>{" "}
+              {spec.Value}
+            </Text>
           ))}
-
-          <ButtonGroup spacing="3" alignItems="center"></ButtonGroup>
         </VStack>
         {editable ? (
-          <>
-            {console.log(lineItem)}
-            {product && (
-              <OcQuantityInput
-                controlId="addToCart"
-                priceSchedule={lineItem.PriceScheduleID}
-                quantity={Number(quantity)}
-                onChange={_setQuantity}
-              />
-            )}
-          </>
+          <OcQuantityInput
+            controlId="addToCart"
+            priceSchedule={lineItem.PriceScheduleID}
+            quantity={Number(quantity)}
+            onChange={setQuantity}
+          />
         ) : (
           <Text ml="auto">Qty: {lineItem.Quantity}</Text>
         )}
@@ -147,7 +149,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
         onClose={() => setIsDeliveryInstructionsModalOpen(false)}
       >
         <ModalOverlay />
-        <ModalContent width="full" w="100%" maxWidth="800px">
+        <ModalContent width="full" w="full" maxWidth="800px">
           <ModalHeader>
             <Heading>Add Delivery Instructions</Heading>
           </ModalHeader>
@@ -156,8 +158,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
             <VStack>
               <Textarea placeholder="Delivery instructions" height="175px" />
               <HStack
-                w="100%"
-                width="full"
+                w="full"
                 justifyItems="space-between"
                 justifyContent="space-between"
                 mb={6}
