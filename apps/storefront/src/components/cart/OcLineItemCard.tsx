@@ -1,7 +1,6 @@
 import {
   Button,
   ButtonGroup,
-  Divider,
   HStack,
   Heading,
   Image,
@@ -17,25 +16,53 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
-import { FunctionComponent, useMemo, useState } from "react";
-import { LineItem } from "ordercloud-javascript-sdk";
+import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
+import { Cart, LineItem } from "ordercloud-javascript-sdk";
 import React from "react";
 import formatPrice from "../../utils/formatPrice";
 import OcQuantityInput from "./OcQuantityInput";
+import useDebounce from "../../hooks/useDebounce";
 
 interface OcLineItemCardProps {
   lineItem: LineItem;
   editable?: boolean;
+  onChange?: (newLi:LineItem) => void;
 }
 
 const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
   lineItem,
   editable,
+  onChange
 }) => {
   const [quantity, _setQuantity] = useState(lineItem.Quantity);
+
+  const debouncedQuantity = useDebounce(quantity, 300);
+
   const product = useMemo(() => lineItem.Product, [lineItem]);
   const [isDeliveryInstructionsModalOpen, setIsDeliveryInstructionsModalOpen] =
     useState(false);
+
+
+  const updateLineItem = useCallback(async (quantity:number) => {
+    const response  = await Cart.PatchLineItem(lineItem.ID!, { Quantity: quantity });
+    if (onChange) {
+      onChange(response);
+    }
+  }, [lineItem, onChange])
+
+  useEffect(() => {
+    
+    updateLineItem(debouncedQuantity);
+  }, [debouncedQuantity, updateLineItem])
+
+
+  const lineSubtotal = useMemo(() => {
+    return formatPrice(lineItem.LineSubtotal)
+  }, [lineItem])
+
+  const unitPrice = useMemo(() => {
+    return formatPrice(lineItem.UnitPrice)
+  }, [lineItem])
 
   return (
     <>
@@ -57,7 +84,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
         <VStack alignItems="flex-start" gap={3} flexGrow="1">
           <Link as={RouterLink} to={`/products/${lineItem?.Product?.ID}`}>
             <Text fontSize="xl" display="inline-block" maxW="md">
-              {lineItem.Product.Name}
+              {lineItem.Product?.Name}
             </Text>
           </Link>
           <HStack alignItems="center" color="chakra-subtle-text" mt={-2}>
@@ -65,7 +92,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
               <Text fontWeight="600" display="inline">
                 Item number:{" "}
               </Text>
-              {lineItem.Product.ID}
+              {lineItem.Product?.ID}
             </Text>
             <Text color="chakra-placeholder-color" fontWeight="thin">
               |
@@ -77,7 +104,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
               {lineItem.Product?.xp?.Brand}
             </Text>
           </HStack>
-          {lineItem?.Specs.map((spec) => (
+          {lineItem?.Specs?.map((spec) => (
             <React.Fragment key={spec.SpecID}>
               <Text mt={-3} fontSize="xs" color="chakra-subtle-text">
                 <Text fontWeight="600" display="inline">
@@ -107,10 +134,10 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
         )}
         <VStack minW="85px" alignItems="flex-end">
           <Text fontWeight="600" fontSize="lg">
-            {formatPrice(lineItem.LineSubtotal)}
+            {lineSubtotal}
           </Text>
           <Text fontSize=".7em" color="chakra-subtle-text">
-            ({formatPrice(lineItem.UnitPrice)} each)
+            ({unitPrice} each)
           </Text>
         </VStack>
       </HStack>

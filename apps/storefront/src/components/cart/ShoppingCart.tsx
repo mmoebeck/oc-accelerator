@@ -80,6 +80,17 @@ export const ShoppingCart = (): JSX.Element => {
     return Array.from(itemMap.values());
   }, [lineItems]);
 
+  const handleLineItemChange = useCallback((liIndex:number) => (newLi:LineItem) => {
+    setLineItems(items => {
+      return items?.map((li, i) => {
+        if (i === liIndex) { 
+          return newLi
+        }
+        return li;
+      })
+  })
+  }, [setLineItems])
+
   return (
     <SimpleGrid
       gridTemplateColumns={lineItems && { lg: "3fr 1fr", xl: "4fr 1fr" }}
@@ -122,6 +133,7 @@ export const ShoppingCart = (): JSX.Element => {
             <OcCurrentOrderLineItemList
               lineItems={mergedLineItems}
               emptyMessage="Your cart is empty"
+              onChange={handleLineItemChange}
               editable
             />
           </VStack>

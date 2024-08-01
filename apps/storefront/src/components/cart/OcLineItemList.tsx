@@ -11,12 +11,14 @@ interface OcLineItemListProps {
   emptyMessage?: string;
   editable?: boolean;
   lineItems?: LineItem[];
+  onChange: (liIndex:number) => (newLineItem:LineItem) => void
 }
 
 const OcLineItemList: FunctionComponent<OcLineItemListProps> = ({
   emptyMessage,
   editable,
   lineItems,
+  onChange,
 }) => {
   const brands = useMemo(() => {
     return lineItems
@@ -34,9 +36,9 @@ const OcLineItemList: FunctionComponent<OcLineItemListProps> = ({
               <CardBody>
                 {lineItems
                   ?.filter((li) => li.Product?.xp.Brand == brand)
-                  .map((li) => (
+                  .map((li, i) => (
                     <React.Fragment key={li.ID}>
-                      <OcLineItemCard lineItem={li} editable={editable} />
+                      <OcLineItemCard lineItem={li} editable={editable} onChange={onChange(i)}/>
                     </React.Fragment>
                   ))}
               </CardBody>
