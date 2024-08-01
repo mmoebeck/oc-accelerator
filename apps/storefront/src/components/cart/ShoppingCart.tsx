@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   CardBody,
+  Center,
   Container,
   Divider,
   HStack,
@@ -20,6 +21,7 @@ import formatPrice from "../../utils/formatPrice";
 import OcCurrentOrderLineItemList from "./OcCurrentOrderLineItemList";
 
 export const ShoppingCart = (): JSX.Element => {
+  const [loading, setLoading] = useState(true);
   const [lineItems, setLineItems] = useState<LineItem[]>();
   const [order, setOrder] = useState<RequiredDeep<Order>>();
   const navigate = useNavigate();
@@ -33,6 +35,7 @@ export const ShoppingCart = (): JSX.Element => {
     if (!order?.ID) return;
     const result = await Cart.ListLineItems();
     setLineItems(result.Items);
+    setLoading(false)
   }, [order]);
 
   const deleteOrder = useCallback(async () => {
@@ -75,12 +78,14 @@ export const ShoppingCart = (): JSX.Element => {
     [setLineItems]
   );
 
-  return (
+  return loading ? (
+    <Center h="100%">
+    <Spinner size="xl" thickness="10px" />
+  </Center>
+  ) : (
     <Stack
       direction={{ base: "column", xl: "row" }}
-      width="full"
       gap={12}
-      mx={{ xl: 12 }}
       mt={"-1rem"}
       h="calc(105% + 1rem)"
     >
@@ -179,7 +184,6 @@ export const ShoppingCart = (): JSX.Element => {
               borderColor="transparent"
               bgColor="transparent"
               w="full"
-              h="full"
               p={0}
             >
               <CardBody

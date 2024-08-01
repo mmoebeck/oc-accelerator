@@ -44,7 +44,7 @@ const Layout: FC = () => {
       <LoginModal disclosure={loginDisclosure} />
       <VStack
         alignItems="flex-start"
-        w="100dvw"
+        w="full"
         h="100dvh"
         sx={{ "&>*": { width: "full" } }}
       >
@@ -61,13 +61,13 @@ const Layout: FC = () => {
               <HStack as="nav" flexGrow="1" ml={3}>
                 <Button
                   as={RouterLink}
-                  isActive={location.pathname === "/products"}
+                  isActive={location.pathname === "/catch-catalog"}
                   _active={{ bgColor: "primary.50" }}
-                  to="/products"
+                  to="/catch-catalog"
                   size="sm"
                   variant="ghost"
                 >
-                  Shop all products
+                  Shop Catch Products
                 </Button>
               </HStack>
               <HStack>
