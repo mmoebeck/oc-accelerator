@@ -11,7 +11,7 @@ import {
   Select,
   VStack,
 } from '@chakra-ui/react'
-import { Me, PriceSchedule, PriceSchedules } from 'ordercloud-javascript-sdk'
+import { Me, PriceSchedule } from 'ordercloud-javascript-sdk'
 
 interface OcQuantityInputProps {
   controlId: string

@@ -1,5 +1,4 @@
 import { chakra, createIcon } from "@chakra-ui/react";
-import React from "react";
 
 export const BunningsLogo = createIcon({
   displayName: "BunningsLogo",
