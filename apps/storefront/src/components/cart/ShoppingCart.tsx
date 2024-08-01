@@ -9,20 +9,16 @@ import {
   Heading,
   Hide,
   SimpleGrid,
+  Spinner,
   Stack,
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { useCallback, useEffect, useState } from "react";
+import { Cart, LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import formatPrice from "../../utils/formatPrice";
 import OcCurrentOrderLineItemList from "./OcCurrentOrderLineItemList";
-import {
-  Cart,
-  LineItem,
-  Order,
-  RequiredDeep,
-} from "ordercloud-javascript-sdk";
-import { useNavigate } from "react-router-dom";
 
 export const ShoppingCart = (): JSX.Element => {
   const [lineItems, setLineItems] = useState<LineItem[]>();
@@ -30,13 +26,13 @@ export const ShoppingCart = (): JSX.Element => {
   const navigate = useNavigate();
 
   const getOrder = useCallback(async () => {
-    const result = await Cart.Get()
-setOrder(result)
+    const result = await Cart.Get();
+    setOrder(result);
   }, []);
 
   const getLineItems = useCallback(async () => {
     if (!order?.ID) return;
-    const result = await Cart.ListLineItems()
+    const result = await Cart.ListLineItems();
     setLineItems(result.Items);
   }, [order]);
 
@@ -54,7 +50,7 @@ setOrder(result)
       await Cart.Submit();
       navigate("/order-summary");
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
   }, [navigate, order?.ID]);
 
@@ -65,6 +61,24 @@ setOrder(result)
   useEffect(() => {
     getLineItems();
   }, [order, getLineItems]);
+
+  // Group line items by product ID and sum their quantities
+  const mergedLineItems = useMemo(() => {
+    const itemMap = new Map();
+
+    lineItems?.forEach((item) => {
+      const { ProductID } = item;
+      if (itemMap.has(ProductID)) {
+        itemMap.get(ProductID).Quantity += item.Quantity;
+      } else {
+        // Otherwise, add it to the map
+        itemMap.set(ProductID, { ...item });
+      }
+    });
+
+    // Convert the map back to an array
+    return Array.from(itemMap.values());
+  }, [lineItems]);
 
   return (
     <SimpleGrid
@@ -91,7 +105,7 @@ setOrder(result)
           >
             Cart
           </Heading>
-          {lineItems?.length !== 0 && (
+          {mergedLineItems.length !== 0 && (
             <Button
               type="button"
               onClick={deleteOrder}
@@ -103,18 +117,19 @@ setOrder(result)
             </Button>
           )}
         </HStack>
-        {lineItems?.length !== 0 ? (
+        {mergedLineItems.length !== 0 ? (
           <VStack gap={6} w="100%" width="full" alignItems="flex-end">
             <OcCurrentOrderLineItemList
-              lineItems={lineItems}
+              lineItems={mergedLineItems}
               emptyMessage="Your cart is empty"
               editable
             />
           </VStack>
         ) : (
-          <Text alignSelf="flex-start">Your cart is empty</Text>
+          <Spinner />
         )}
       </VStack>
+      {/* Cart Summary  */}
       {lineItems && (
         <Card
           order={{ base: -1, lg: 1 }}
@@ -161,11 +176,11 @@ setOrder(result)
                 onClick={submitOrder}
                 size={{ base: "sm", lg: "lg" }}
                 fontSize="lg"
-                colorScheme="green"
+                colorScheme="primary"
                 w={{ lg: "full" }}
                 _hover={{ textDecoration: "none" }}
               >
-                Submit Order
+                Proceed to Checkout
               </Button>
             </ButtonGroup>
           </CardBody>
