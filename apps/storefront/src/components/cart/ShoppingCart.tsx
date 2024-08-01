@@ -8,13 +8,10 @@ import {
   Divider,
   HStack,
   Heading,
-  SimpleGrid,
   Spinner,
   Stack,
   Text,
   VStack,
-  theme,
-  useMediaQuery,
 } from "@chakra-ui/react";
 import { Cart, LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
 import { useCallback, useEffect, useState } from "react";
@@ -31,11 +28,6 @@ export const ShoppingCart = (): JSX.Element => {
     const result = await Cart.Get();
     setOrder(result);
   }, []);
-
-  const [belowXL] = useMediaQuery(`(max-width: ${theme.breakpoints["xl"]})`, {
-    ssr: true,
-    fallback: false, // return false on the server, and re-evaluate on the client side
-  });
 
   const getLineItems = useCallback(async () => {
     if (!order?.ID) return;
@@ -84,47 +76,57 @@ export const ShoppingCart = (): JSX.Element => {
   );
 
   return (
-    <SimpleGrid
-      gridTemplateColumns={lineItems && { xl: "1fr 1fr" }}
+    <Stack
+      direction={{ base: "column", xl: "row" }}
       width="full"
       gap={12}
-      margin="0 auto"
+      mx={{ xl: 12 }}
       mt={"-1rem"}
       h="calc(105% + 1rem)"
     >
       <VStack
+        flexGrow="1"
         alignItems="flex-start"
-        maxW="container.lg"
+        justifyContent="flex-start"
+        maxW="container.xl"
         minW="container.md"
-        ml="auto"
+        boxSize="full"
         pt={14}
       >
-        <Heading size="md" color="chakra-subtle-text">
-          Shipping
-        </Heading>
-        <Card
-          w="full"
-          minH="200"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
+        <Container
+          maxW="container.lg"
+          mx={0}
+          ml="auto"
+          as={VStack}
+          alignItems="flex-start"
         >
-          <Text fontFamily="monospace" textTransform="uppercase">
-            shipping address form here
-          </Text>
-        </Card>
-        <Heading size="md" color="chakra-subtle-text" mt={8}>
-          Payment
-        </Heading>
-        <Card
-          w="full"
-          minH="200"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Text fontFamily="monospace">IFRAME EMBED GOES HERE</Text>
-        </Card>
+          <Heading size="md" color="chakra-subtle-text">
+            Shipping
+          </Heading>
+          <Card
+            w="full"
+            minH="200"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Text fontFamily="monospace" textTransform="uppercase">
+              shipping address form here
+            </Text>
+          </Card>
+          <Heading size="md" color="chakra-subtle-text" mt={8}>
+            Payment
+          </Heading>
+          <Card
+            w="full"
+            minH="200"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Text fontFamily="monospace">IFRAME EMBED GOES HERE</Text>
+          </Card>
+        </Container>
       </VStack>
       <VStack
         p={12}
@@ -135,7 +137,7 @@ export const ShoppingCart = (): JSX.Element => {
         maxW="full"
         minW="container.md"
       >
-        <Container w="full" mx={0}>
+        <Container w="full" mx={0} maxW="container.lg" pr={{ xl: "24" }}>
           <HStack
             w="full"
             justifyContent="space-between"
@@ -223,6 +225,6 @@ export const ShoppingCart = (): JSX.Element => {
           )}
         </Container>
       </VStack>
-    </SimpleGrid>
+    </Stack>
   );
 };
