@@ -17,7 +17,7 @@ const routes: RouteObject[] = [
         path: "/cart",
         element: <ShoppingCart />,
       },
-      {path: 'order-summary', element: <OrderSummary />}
+      {path: '/order-summary', element: <OrderSummary />}
     ],
   },
 ];

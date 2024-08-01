@@ -14,53 +14,26 @@ import {
   Text,
   Textarea,
   VStack,
-} from '@chakra-ui/react'
-import { FormEvent, FunctionComponent, useCallback, useState } from 'react'
-// import { removeLineItem, updateLineItem } from '../../../redux/ocCurrentOrder'
-
-// import NextLink from 'next/link'
-import { LineItem } from 'ordercloud-javascript-sdk'
-// import formatPrice from 'src/utils/formatPrice'
-// import useOcProduct from '../../../hooks/useOcProduct'
-// import { useOcDispatch } from '../../../redux/ocStore'
-import React from 'react'
-import { useOcDispatch } from '../redux/ocStore'
-import useOcProduct from '../hooks/useOcProduct'
-import { removeLineItem, updateLineItem } from '../redux/ocCurrentOrder'
-import formatPrice from '../utils/formatPrice'
-import OcQuantityInput from './OcQuantityInput'
+} from "@chakra-ui/react";
+import { FunctionComponent, useMemo, useState } from "react";
+import { LineItem } from "ordercloud-javascript-sdk";
+import React from "react";
+import formatPrice from "../utils/formatPrice";
 
 interface OcLineItemCardProps {
-  lineItem: LineItem
-  editable?: boolean
+  lineItem: LineItem;
+  editable?: boolean;
 }
 
-const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({ lineItem, editable }) => {
-  const dispatch = useOcDispatch()
-  const [disabled, setDisabled] = useState(false)
-  const [quantity, setQuantity] = useState(lineItem.Quantity)
-  const product = useOcProduct(lineItem.ProductID)
-  const [isDeliveryInstructionsModalOpen, setIsDeliveryInstructionsModalOpen] = useState(false)
+const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
+  lineItem,
+  editable,
+}) => {
+  const [quantity, _setQuantity] = useState(lineItem.Quantity);
+  const product = useMemo(() => lineItem.Product, [lineItem]);
+  const [isDeliveryInstructionsModalOpen, setIsDeliveryInstructionsModalOpen] =
+    useState(false);
 
-  const handleRemoveLineItem = useCallback(async () => {
-    setDisabled(true)
-    await dispatch(removeLineItem(lineItem.ID))
-    setDisabled(false)
-  }, [dispatch, lineItem])
-
-  const handleUpdateLineItem = useCallback(
-    async (e: FormEvent) => {
-      e.preventDefault()
-      setDisabled(true)
-      await dispatch(updateLineItem({ ...lineItem, Quantity: quantity }))
-      setDisabled(false)
-    },
-    [dispatch, quantity, lineItem]
-  )
-
-  // const isUpdateDisabled = useMemo(() => {
-  //   return disabled || lineItem.Quantity === quantity
-  // }, [lineItem, disabled, quantity])
 
   return (
     <>
@@ -69,7 +42,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({ lineItem, edit
         flexWrap="wrap"
         mb={6}
         pb={6}
-        p={{ base: 3, md: 'unset' }}
+        p={{ base: 3, md: "unset" }}
         gap={9}
         w="full"
       >
@@ -81,65 +54,36 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({ lineItem, edit
           borderRadius="sm"
           src={lineItem?.Product?.xp?.Images?.[0].Url}
         />
-        <VStack
-          alignItems="flex-start"
-          gap={3}
-        >
+        <VStack alignItems="flex-start" gap={3}>
           <Link
             href={`product-details?productid=${lineItem?.Product?.ID}`}
             // passHref
           >
-            <Link
-              fontSize="xl"
-              display="inline-block"
-              maxW="md"
-            >
+            <Link fontSize="xl" display="inline-block" maxW="md">
               {lineItem.Product.Name}
             </Link>
           </Link>
-          <Text
-            mt={-3}
-            fontSize="xs"
-            color="chakra-subtle-text"
-          >
-            <Text
-              fontWeight="600"
-              display="inline"
-            >
-              Item number:{' '}
+          <Text mt={-3} fontSize="xs" color="chakra-subtle-text">
+            <Text fontWeight="600" display="inline">
+              Item number:{" "}
             </Text>
             {lineItem.Product.ID}
           </Text>
-          <Text
-            mt={-3}
-            fontSize="xs"
-            color="chakra-subtle-text"
-          >
-            
+          <Text mt={-3} fontSize="xs" color="chakra-subtle-text">
             {lineItem.Product?.xp?.Brand}
           </Text>
           {lineItem?.Specs.map((spec) => (
             <React.Fragment key={spec.SpecID}>
-              <Text
-                mt={-3}
-                fontSize="xs"
-                color="chakra-subtle-text"
-              >
-                <Text
-                  fontWeight="600"
-                  display="inline"
-                >
+              <Text mt={-3} fontSize="xs" color="chakra-subtle-text">
+                <Text fontWeight="600" display="inline">
                   {spec.Name}:
-                </Text>{' '}
+                </Text>{" "}
                 {spec.Value}
               </Text>
             </React.Fragment>
           ))}
-          <ButtonGroup
-            spacing="3"
-            alignItems="center"
-          >
-          </ButtonGroup>
+
+          <ButtonGroup spacing="3" alignItems="center"></ButtonGroup>
         </VStack>
         {editable ? (
           <>
@@ -148,7 +92,6 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({ lineItem, edit
                 alignItems="flex-start"
                 ml="auto"
                 as="form"
-                // onSubmit={handleUpdateLineItem}
               >
                 <Text>Quantity</Text>
                 <Text>{quantity}</Text>
@@ -158,20 +101,11 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({ lineItem, edit
         ) : (
           <Text ml="auto">Qty: {lineItem.Quantity}</Text>
         )}
-        <VStack
-          minW="85px"
-          alignItems="flex-end"
-        >
-          <Text
-            fontWeight="600"
-            fontSize="lg"
-          >
+        <VStack minW="85px" alignItems="flex-end">
+          <Text fontWeight="600" fontSize="lg">
             {formatPrice(lineItem.LineSubtotal)}
           </Text>
-          <Text
-            fontSize=".7em"
-            color="chakra-subtle-text"
-          >
+          <Text fontSize=".7em" color="chakra-subtle-text">
             ({formatPrice(lineItem.UnitPrice)} each)
           </Text>
         </VStack>
@@ -182,21 +116,14 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({ lineItem, edit
         onClose={() => setIsDeliveryInstructionsModalOpen(false)}
       >
         <ModalOverlay />
-        <ModalContent
-          width="full"
-          w="100%"
-          maxWidth="800px"
-        >
+        <ModalContent width="full" w="100%" maxWidth="800px">
           <ModalHeader>
             <Heading>Add Delivery Instructions</Heading>
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <VStack>
-              <Textarea
-                placeholder="Delivery instructions"
-                height="175px"
-              />
+              <Textarea placeholder="Delivery instructions" height="175px" />
               <HStack
                 w="100%"
                 width="full"
@@ -233,7 +160,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({ lineItem, edit
         </ModalContent>
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default OcLineItemCard
+export default OcLineItemCard;
