@@ -1,6 +1,7 @@
 import {
   Button,
   ButtonGroup,
+  Divider,
   HStack,
   Heading,
   Image,
@@ -15,10 +16,12 @@ import {
   Textarea,
   VStack,
 } from "@chakra-ui/react";
+import { Link as RouterLink } from "react-router-dom";
 import { FunctionComponent, useMemo, useState } from "react";
 import { LineItem } from "ordercloud-javascript-sdk";
 import React from "react";
 import formatPrice from "../../utils/formatPrice";
+import OcQuantityInput from "./OcQuantityInput";
 
 interface OcLineItemCardProps {
   lineItem: LineItem;
@@ -34,14 +37,11 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
   const [isDeliveryInstructionsModalOpen, setIsDeliveryInstructionsModalOpen] =
     useState(false);
 
-
   return (
     <>
       <HStack
         id="lineItemRow"
         flexWrap="wrap"
-        mb={6}
-        pb={6}
         p={{ base: 3, md: "unset" }}
         gap={9}
         w="full"
@@ -54,24 +54,29 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
           borderRadius="sm"
           src={lineItem?.Product?.xp?.Images?.[0].Url}
         />
-        <VStack alignItems="flex-start" gap={3}>
-          <Link
-            href={`product-details?productid=${lineItem?.Product?.ID}`}
-            // passHref
-          >
-            <Link fontSize="xl" display="inline-block" maxW="md">
+        <VStack alignItems="flex-start" gap={3} flexGrow="1">
+          <Link as={RouterLink} to={`/products/${lineItem?.Product?.ID}`}>
+            <Text fontSize="xl" display="inline-block" maxW="md">
               {lineItem.Product.Name}
-            </Link>
-          </Link>
-          <Text mt={-3} fontSize="xs" color="chakra-subtle-text">
-            <Text fontWeight="600" display="inline">
-              Item number:{" "}
             </Text>
-            {lineItem.Product.ID}
-          </Text>
-          <Text mt={-3} fontSize="xs" color="chakra-subtle-text">
-            {lineItem.Product?.xp?.Brand}
-          </Text>
+          </Link>
+          <HStack alignItems="center" color="chakra-subtle-text" mt={-2}>
+            <Text fontSize="xs">
+              <Text fontWeight="600" display="inline">
+                Item number:{" "}
+              </Text>
+              {lineItem.Product.ID}
+            </Text>
+            <Text color="chakra-placeholder-color" fontWeight="thin">
+              |
+            </Text>
+            <Text fontSize="xs">
+              <Text fontWeight="600" display="inline">
+                Brand:{" "}
+              </Text>
+              {lineItem.Product?.xp?.Brand}
+            </Text>
+          </HStack>
           {lineItem?.Specs.map((spec) => (
             <React.Fragment key={spec.SpecID}>
               <Text mt={-3} fontSize="xs" color="chakra-subtle-text">
@@ -87,15 +92,14 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
         </VStack>
         {editable ? (
           <>
+            {console.log(lineItem)}
             {product && (
-              <VStack
-                alignItems="flex-start"
-                ml="auto"
-                as="form"
-              >
-                <Text>Quantity</Text>
-                <Text>{quantity}</Text>
-              </VStack>
+              <OcQuantityInput
+                controlId="addToCart"
+                priceSchedule={lineItem.PriceScheduleID}
+                quantity={Number(quantity)}
+                onChange={_setQuantity}
+              />
             )}
           </>
         ) : (

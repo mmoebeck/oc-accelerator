@@ -1,31 +1,29 @@
-import { BuyerProduct, Me } from "ordercloud-javascript-sdk";
-import { FunctionComponent, useCallback, useEffect, useState } from "react";
-// import useOcProductList from "../../hooks/useOcProductList";
-// import { OcProductListOptions } from "../../redux/ocProductList";
 import { SimpleGrid } from "@chakra-ui/react";
-import React from "react";
+import { BuyerProduct, Me } from "ordercloud-javascript-sdk";
+import React, {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import ProductCard from "./ProductCard";
-import { useOcResourceList } from "@rwatt451/ordercloud-react";
-
 export interface ProductListProps {
-  options?: any;
   renderItem?: (product: BuyerProduct) => JSX.Element;
 }
 
-const ProductList: FunctionComponent<ProductListProps> = ({
-  options,
-  renderItem,
-}) => {
-  const [products, setProducts] = useState<BuyerProduct[]>()
+const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
+  const [products, setProducts] = useState<BuyerProduct[]>();
 
-  const getProducts = useCallback(async ()=> {
-    const result = await Me.ListProducts({filters: {'xp.Images': '*', 'SpecCount': 0, 'xp.Brand': '*'}}) // do we need to support specs?
-    setProducts(result?.Items)
-  },[])
+  const getProducts = useCallback(async () => {
+    const result = await Me.ListProducts({
+      filters: { "xp.Images": "*", SpecCount: 0, "xp.Brand": "*" },
+    }); // do we need to support specs?
+    setProducts(result?.Items);
+  }, []);
 
-  useEffect(()=> {
-    getProducts()
-  }, [getProducts])
+  useEffect(() => {
+    getProducts();
+  }, [getProducts]);
 
   return (
     <SimpleGrid

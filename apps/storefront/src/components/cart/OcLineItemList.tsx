@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { Box, Heading, Text, VStack } from "@chakra-ui/react";
+import { Box, Card, CardBody, Heading, Text, VStack } from "@chakra-ui/react";
 
 import { LineItem } from "ordercloud-javascript-sdk";
 import React, { FunctionComponent, useMemo } from "react";
@@ -29,18 +29,18 @@ const OcLineItemList: FunctionComponent<OcLineItemListProps> = ({
       {brands?.map((brand) => {
         return (
           <>
-            <Heading as="h4" size="md">
-              {brand}
-            </Heading>
-            <Box padding={5}>
-              {lineItems
-                ?.filter((li) => li.Product?.xp.Brand == brand)
-                .map((li) => (
-                  <React.Fragment key={li.ID}>
-                    <OcLineItemCard lineItem={li} editable={editable} />
-                  </React.Fragment>
-                ))}
-            </Box>
+            <Heading size="sm">{brand}</Heading>
+            <Card variant="outline" w="full" mt={-4} rounded="none">
+              <CardBody>
+                {lineItems
+                  ?.filter((li) => li.Product?.xp.Brand == brand)
+                  .map((li) => (
+                    <React.Fragment key={li.ID}>
+                      <OcLineItemCard lineItem={li} editable={editable} />
+                    </React.Fragment>
+                  ))}
+              </CardBody>
+            </Card>
           </>
         );
       })}

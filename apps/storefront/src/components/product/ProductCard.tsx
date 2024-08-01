@@ -40,7 +40,6 @@ const ProductCard: FunctionComponent<ProductCardProps> = ({ product }) => {
               transform: "translateY(-1px)",
               borderColor: "primary.100",
             }}
-            overflow="hidden"
           >
             <CardBody
               m={0}
@@ -58,17 +57,29 @@ const ProductCard: FunctionComponent<ProductCardProps> = ({ product }) => {
                 maxH="300px"
                 borderTopRadius="md"
               >
-                {product.xp?.Images ? (
+                {product.xp?.Images && product.xp.Images[0]?.Url ? (
                   <Image
                     borderTopRadius="md"
-                    h="100%"
+                    boxSize="full"
                     objectFit="cover"
-                    src={product.xp?.Images[0]?.Url}
+                    src={product.xp.Images[0].Url}
+                    zIndex={1}
+                    onError={(e) => {
+                      e.currentTarget.src = ""; // Prevent the broken image from rendering
+                      e.currentTarget.style.display = "none"; // Hide the broken image
+                    }}
                   />
                 ) : (
                   <Icon fontSize="5rem" color="gray.300" as={TbPhoto} />
                 )}
+                <Icon
+                  fontSize="5rem"
+                  color="gray.300"
+                  as={TbPhoto}
+                  position="absolute"
+                />
               </Center>
+
               <VStack
                 w="full"
                 minH={product.xp?.Brand ? "calc(120px + 2rem)" : "120px"}

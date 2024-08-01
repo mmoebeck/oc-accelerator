@@ -12,15 +12,20 @@ import {
 } from "@chakra-ui/react";
 import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
 import { FC, useEffect } from "react";
-import { Link, Outlet } from "react-router-dom";
-import LoginModal from "./LoginModal";
+import { TbShoppingCart } from "react-icons/tb";
+import {
+  Link,
+  Outlet,
+  useLocation,
+  Link as RouterLink,
+} from "react-router-dom";
 import { APP_NAME } from "../constants";
 import { useCurrentUser } from "../hooks/currentUser";
-import { TbLink, TbShoppingCart } from "react-icons/tb";
+import LoginModal from "./LoginModal";
 
 const Layout: FC = () => {
   const { data: user } = useCurrentUser();
-
+  const location = useLocation();
   const { allowAnonymous, isAuthenticated, isLoggedIn, logout } =
     useOrderCloudContext();
 
@@ -43,10 +48,22 @@ const Layout: FC = () => {
         h="100dvh"
         sx={{ "&>*": { width: "full" } }}
       >
-        <GridItem area={"header"} zIndex={2} shadow="md">
+        <GridItem area={"header"} zIndex={2} shadow="md" py={2}>
           <Container h="100%" maxW="full">
-            <HStack h="100%" justify="space-between" alignItems="center">
+            <HStack h="100%" justify="flex-start" alignItems="center">
               <Heading size="md">{APP_NAME}</Heading>
+              <HStack as="nav" flexGrow="1" ml={3}>
+                <Button
+                  as={RouterLink}
+                  isActive={location.pathname === "/products"}
+                  _active={{ bgColor: "primary.50" }}
+                  to="/products"
+                  size="sm"
+                  variant="ghost"
+                >
+                  Shop all products
+                </Button>
+              </HStack>
               <HStack>
                 <Heading size="sm">
                   {isLoggedIn
@@ -55,7 +72,7 @@ const Layout: FC = () => {
                 </Heading>
                 <Link to={"/cart"}>
                   <IconButton
-                  size="lg"
+                    size="lg"
                     icon={<Icon as={TbShoppingCart} />}
                     variant="unstyled"
                     aria-label={`Link to cart`}
@@ -73,8 +90,7 @@ const Layout: FC = () => {
               </HStack>
             </HStack>
           </Container>
-          </GridItem>
-        {/* </HStack> */}
+        </GridItem>
         <Container maxW="container.2xl" py={8} as="main" flex="1">
           <Outlet />
         </Container>
