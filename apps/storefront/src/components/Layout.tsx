@@ -70,14 +70,16 @@ const Layout: FC = () => {
                     ? `Welcome, ${user?.FirstName} ${user?.LastName}`
                     : "Welcome"}
                 </Heading>
-                <Link to={"/cart"}>
-                  <IconButton
-                    size="lg"
-                    icon={<Icon as={TbShoppingCart} />}
-                    variant="unstyled"
-                    aria-label={`Link to cart`}
-                  />
-                </Link>
+                <Button
+                  as={Link}
+                  to="/cart"
+                  variant="outline"
+                  size="sm"
+                  leftIcon={<Icon as={TbShoppingCart} />}
+                  aria-label={`Link to cart`}
+                >
+                  Cart
+                </Button>
                 {isLoggedIn ? (
                   <Button size="sm" onClick={logout}>
                     Logout

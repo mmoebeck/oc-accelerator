@@ -1,8 +1,10 @@
 import {
   Button,
   ButtonGroup,
+  Center,
   HStack,
   Heading,
+  Icon,
   Image,
   Link,
   Modal,
@@ -16,54 +18,63 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
-import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Cart, LineItem } from "ordercloud-javascript-sdk";
 import React from "react";
 import formatPrice from "../../utils/formatPrice";
 import OcQuantityInput from "./OcQuantityInput";
 import useDebounce from "../../hooks/useDebounce";
+import { TbPhoto } from "react-icons/tb";
 
 interface OcLineItemCardProps {
   lineItem: LineItem;
   editable?: boolean;
-  onChange?: (newLi:LineItem) => void;
+  onChange?: (newLi: LineItem) => void;
 }
 
 const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
   lineItem,
   editable,
-  onChange
+  onChange,
 }) => {
   const [quantity, _setQuantity] = useState(lineItem.Quantity);
 
-  const debouncedQuantity:number = useDebounce(quantity, 300);
+  const debouncedQuantity: number = useDebounce(quantity, 300);
 
   const product = useMemo(() => lineItem.Product, [lineItem]);
   const [isDeliveryInstructionsModalOpen, setIsDeliveryInstructionsModalOpen] =
     useState(false);
 
-
-  const updateLineItem = useCallback(async (quantity:number) => {
-    if (lineItem.Quantity === quantity) return;
-    const response  = await Cart.PatchLineItem(lineItem.ID!, { Quantity: quantity });
-    if (onChange) {
-      onChange(response);
-    }
-  }, [lineItem, onChange])
+  const updateLineItem = useCallback(
+    async (quantity: number) => {
+      if (lineItem.Quantity === quantity) return;
+      const response = await Cart.PatchLineItem(lineItem.ID!, {
+        Quantity: quantity,
+      });
+      if (onChange) {
+        onChange(response);
+      }
+    },
+    [lineItem, onChange]
+  );
 
   useEffect(() => {
-    
     updateLineItem(debouncedQuantity);
-  }, [debouncedQuantity, updateLineItem])
-
+  }, [debouncedQuantity, updateLineItem]);
 
   const lineSubtotal = useMemo(() => {
-    return formatPrice(lineItem.LineSubtotal)
-  }, [lineItem])
+    return formatPrice(lineItem.LineSubtotal);
+  }, [lineItem]);
 
   const unitPrice = useMemo(() => {
-    return formatPrice(lineItem.UnitPrice)
-  }, [lineItem])
+    return formatPrice(lineItem.UnitPrice);
+  }, [lineItem]);
 
   return (
     <>
@@ -74,14 +85,36 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
         gap={9}
         w="full"
       >
-        <Image
-          boxSize="100px"
-          objectFit="cover"
+        <Center
+          bgColor="chakra-subtle-bg"
           aspectRatio="1 / 1"
-          shadow="sm"
-          borderRadius="sm"
-          src={lineItem?.Product?.xp?.Images?.[0].Url}
-        />
+          objectFit="cover"
+          boxSize="100px"
+          borderTopRadius="md"
+        >
+          {lineItem?.Product?.xp?.Images ? (
+            <Image
+              borderTopRadius="md"
+              boxSize="full"
+              objectFit="cover"
+              src={lineItem?.Product?.xp?.Images[0].Url}
+              zIndex={1}
+              onError={(e) => {
+                e.currentTarget.src = ""; // Prevent the broken image from rendering
+                e.currentTarget.style.display = "none"; // Hide the broken image
+              }}
+            />
+          ) : (
+            <Icon fontSize="2rem" color="gray.300" as={TbPhoto} />
+          )}
+          <Icon
+            fontSize="2rem"
+            color="gray.300"
+            as={TbPhoto}
+            position="absolute"
+          />
+        </Center>
+
         <VStack alignItems="flex-start" gap={3} flexGrow="1">
           <Link as={RouterLink} to={`/products/${lineItem?.Product?.ID}`}>
             <Text fontSize="xl" display="inline-block" maxW="md">
@@ -119,8 +152,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
           <ButtonGroup spacing="3" alignItems="center"></ButtonGroup>
         </VStack>
         {editable ? (
-          <>
-            {console.log(lineItem)}
+          <VStack alignItems="flex-start">
             {product && (
               <OcQuantityInput
                 controlId="addToCart"
@@ -129,7 +161,10 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
                 onChange={_setQuantity}
               />
             )}
-          </>
+            <Button size="xs" fontSize=".75rem" variant="link">
+              Remove
+            </Button>
+          </VStack>
         ) : (
           <Text ml="auto">Qty: {lineItem.Quantity}</Text>
         )}
