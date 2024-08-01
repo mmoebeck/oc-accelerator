@@ -1,24 +1,31 @@
 import {
   Button,
-  Center,
   Container,
-  Grid,
   GridItem,
   HStack,
   Heading,
+  Icon,
   Text,
+  VStack,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
 import { FC, useEffect } from "react";
-import { Outlet } from "react-router-dom";
-import LoginModal from "./LoginModal";
+import { TbShoppingCart } from "react-icons/tb";
+import {
+  Link,
+  Outlet,
+  Link as RouterLink,
+  useLocation,
+} from "react-router-dom";
 import { APP_NAME } from "../constants";
 import { useCurrentUser } from "../hooks/currentUser";
+import LoginModal from "./LoginModal";
 
 const Layout: FC = () => {
-  const {data:user} = useCurrentUser();
-
+  const { data: user } = useCurrentUser();
+  const location = useLocation();
+  const { pathname } = useLocation();
   const { allowAnonymous, isAuthenticated, isLoggedIn, logout } =
     useOrderCloudContext();
 
@@ -35,26 +42,50 @@ const Layout: FC = () => {
   return (
     <>
       <LoginModal disclosure={loginDisclosure} />
-      <Grid
-        templateAreas={`"header header"
-            "nav main"
-            "nav footer"`}
-        gridTemplateRows={"50px 1fr 50px"}
-        gridTemplateColumns={"300px 1fr"}
-        h="100vh"
-        color="blackAlpha.700"
-        fontWeight="bold"
+      <VStack
+        alignItems="flex-start"
+        w="100dvw"
+        h="100dvh"
+        sx={{ "&>*": { width: "full" } }}
       >
-        <GridItem area={"header"} zIndex={2} shadow="md">
+        <GridItem
+          area={"header"}
+          zIndex={2}
+          bgColor="chakra-body-bg"
+          shadow="md"
+          py={2}
+        >
           <Container h="100%" maxW="full">
-            <HStack h="100%" justify="space-between" alignItems="center">
+            <HStack h="100%" justify="flex-start" alignItems="center">
               <Heading size="md">{APP_NAME}</Heading>
+              <HStack as="nav" flexGrow="1" ml={3}>
+                <Button
+                  as={RouterLink}
+                  isActive={location.pathname === "/products"}
+                  _active={{ bgColor: "primary.50" }}
+                  to="/products"
+                  size="sm"
+                  variant="ghost"
+                >
+                  Shop all products
+                </Button>
+              </HStack>
               <HStack>
                 <Heading size="sm">
                   {isLoggedIn
                     ? `Welcome, ${user?.FirstName} ${user?.LastName}`
                     : "Welcome"}
                 </Heading>
+                <Button
+                  as={Link}
+                  to="/cart"
+                  variant="outline"
+                  size="sm"
+                  leftIcon={<Icon as={TbShoppingCart} />}
+                  aria-label={`Link to cart`}
+                >
+                  Cart
+                </Button>
                 {isLoggedIn ? (
                   <Button size="sm" onClick={logout}>
                     Logout
@@ -68,20 +99,28 @@ const Layout: FC = () => {
             </HStack>
           </Container>
         </GridItem>
-        <GridItem area={"nav"} zIndex={1} shadow="lg" bg="blackAlpha.100">
-          <Center h="100%">
-            <Text>Navigation</Text>
-          </Center>
-        </GridItem>
-        <GridItem area={"main"} overflowY="scroll" overflowX="hidden">
+        <Container
+          maxW={pathname === "/cart" ? "full" : "container.2xl"}
+          px={pathname === "/cart" ? 0 : "unset"}
+          my={pathname === "/cart" ? 0 : 8}
+          as="main"
+          flex="1"
+        >
           <Outlet />
-        </GridItem>
-        <GridItem as={Center} area={"footer"} bg="blackAlpha.50">
+        </Container>
+        <HStack
+          alignItems="center"
+          justifyContent="center"
+          as="footer"
+          py={3}
+          zIndex="12"
+          bg="gray.50"
+        >
           <Text fontWeight="normal" fontSize="sm">
             © Sitcore Inc. 2024
           </Text>
-        </GridItem>
-      </Grid>
+        </HStack>
+      </VStack>
     </>
   );
 };
