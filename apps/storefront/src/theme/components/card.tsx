@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {cardAnatomy} from "@chakra-ui/anatomy"
 import {createMultiStyleConfigHelpers} from "@chakra-ui/react"
 import {mode} from "@chakra-ui/theme-tools"
 const {definePartsStyle, defineMultiStyleConfig} = createMultiStyleConfigHelpers(cardAnatomy.keys)
 
-const baseStyle = (props) =>
+const baseStyle = (props:any) =>
   definePartsStyle({
     container: {
       borderRadius: "md",
@@ -12,7 +13,7 @@ const baseStyle = (props) =>
   })
 
 const variants = {
-  levitating: (props) =>
+  levitating: () =>
     definePartsStyle({
       header: {
         textTransform: "capitalize"

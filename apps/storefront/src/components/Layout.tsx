@@ -61,6 +61,16 @@ const Layout: FC = () => {
               <HStack as="nav" flexGrow="1" ml={3}>
                 <Button
                   as={RouterLink}
+                  isActive={location.pathname === "/products"}
+                  _active={{ bgColor: "primary.50" }}
+                  to="/products"
+                  size="sm"
+                  variant="ghost"
+                >
+                  Shop All Products
+                </Button>
+                <Button
+                  as={RouterLink}
                   isActive={location.pathname === "/catch-catalog"}
                   _active={{ bgColor: "primary.50" }}
                   to="/catch-catalog"
@@ -68,6 +78,16 @@ const Layout: FC = () => {
                   variant="ghost"
                 >
                   Shop Catch Products
+                </Button>
+                <Button
+                  as={RouterLink}
+                  isActive={location.pathname === "/bunnings-catalog"}
+                  _active={{ bgColor: "primary.50" }}
+                  to="/bunnings-catalog"
+                  size="sm"
+                  variant="ghost"
+                >
+                  Shop Bunnings Products
                 </Button>
               </HStack>
               <HStack>
