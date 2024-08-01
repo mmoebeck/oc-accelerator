@@ -22,7 +22,7 @@ interface OcLineItemListProps {
 
 const brandLogoMap: { [key: string]: ComponentWithAs<"svg", IconProps> } = {
   bunnings: BunningsLogo,
-  catch: CatchLogo,
+  catch_supplier: CatchLogo,
   //TODO: Add the rest of their brands later (i have them somewhere in a branch from a previous demo)
 };
 
