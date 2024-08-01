@@ -44,7 +44,7 @@ const Layout: FC = () => {
       <LoginModal disclosure={loginDisclosure} />
       <VStack
         alignItems="flex-start"
-        w="100dvw"
+        w="full"
         h="100dvh"
         sx={{ "&>*": { width: "full" } }}
       >

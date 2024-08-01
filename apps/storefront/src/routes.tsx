@@ -1,5 +1,4 @@
 import { RouteObject } from "react-router-dom";
-import Dashboard from "./components/Dashboard";
 import Layout from "./components/Layout";
 import { ShoppingCart } from "./components/cart/ShoppingCart";
 import { OrderSummary } from "./components/cart/OrderSummary";
@@ -13,7 +12,7 @@ const routes: RouteObject[] = [
     children: [
       {
         path: "/",
-        element: <Dashboard />,
+        element: <ProductList />,
       },
       {
         path: "/cart",

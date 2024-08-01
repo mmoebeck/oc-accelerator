@@ -78,9 +78,7 @@ export const ShoppingCart = (): JSX.Element => {
   return (
     <Stack
       direction={{ base: "column", xl: "row" }}
-      width="full"
       gap={12}
-      mx={{ xl: 12 }}
       mt={"-1rem"}
       h="calc(105% + 1rem)"
     >
@@ -179,7 +177,6 @@ export const ShoppingCart = (): JSX.Element => {
               borderColor="transparent"
               bgColor="transparent"
               w="full"
-              h="full"
               p={0}
             >
               <CardBody
