@@ -80,8 +80,16 @@ export const ShoppingCart = (): JSX.Element => {
 
   return (
     <>
-      <Button position="fixed" bottom="3" right="3" onClick={onToggle}>
-        Open
+      <Button
+        variant="solid"
+        size="sm"
+        colorScheme="primary"
+        position="fixed"
+        bottom="16"
+        right="8"
+        onClick={onToggle}
+      >
+        Toggle iframe card
       </Button>
       <SimpleGrid
         gridTemplateColumns={
@@ -90,20 +98,21 @@ export const ShoppingCart = (): JSX.Element => {
         width="full"
         gap={6}
       >
-        <Card
-          in={isOpen}
-          as={SlideFade}
-          variant="outline"
-          w="full"
-          rounded="none"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          fontFamily="monospace"
-        >
-          IFRAME EMBED GOES HERE
-        </Card>
-
+        {isOpen && (
+          <Card
+            in={isOpen}
+            as={SlideFade}
+            variant="outline"
+            w="full"
+            rounded="none"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            fontFamily="monospace"
+          >
+            IFRAME EMBED GOES HERE
+          </Card>
+        )}
         <VStack alignItems="flex-start">
           <HStack
             w="full"
