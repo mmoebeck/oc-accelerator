@@ -4,16 +4,17 @@ import {
   Button,
   Card,
   CardBody,
+  Container,
+  Divider,
   HStack,
   Heading,
-  Hide,
   SimpleGrid,
-  SlideFade,
   Spinner,
   Stack,
   Text,
   VStack,
-  useDisclosure,
+  theme,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import { Cart, LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
 import { useCallback, useEffect, useState } from "react";
@@ -25,12 +26,16 @@ export const ShoppingCart = (): JSX.Element => {
   const [lineItems, setLineItems] = useState<LineItem[]>();
   const [order, setOrder] = useState<RequiredDeep<Order>>();
   const navigate = useNavigate();
-  const { isOpen, onToggle } = useDisclosure();
 
   const getOrder = useCallback(async () => {
     const result = await Cart.Get();
     setOrder(result);
   }, []);
+
+  const [belowXL] = useMediaQuery(`(max-width: ${theme.breakpoints["xl"]})`, {
+    ssr: true,
+    fallback: false, // return false on the server, and re-evaluate on the client side
+  });
 
   const getLineItems = useCallback(async () => {
     if (!order?.ID) return;
@@ -79,61 +84,66 @@ export const ShoppingCart = (): JSX.Element => {
   );
 
   return (
-    <>
-      <Button
-        variant="solid"
-        size="sm"
-        colorScheme="primary"
-        position="fixed"
-        bottom="16"
-        right="8"
-        onClick={onToggle}
+    <SimpleGrid
+      gridTemplateColumns={lineItems && { xl: "1fr 1fr" }}
+      width="full"
+      gap={12}
+      margin="0 auto"
+      mt={"-1rem"}
+      h="calc(105% + 1rem)"
+    >
+      <VStack
+        alignItems="flex-start"
+        maxW="container.lg"
+        minW="container.md"
+        ml="auto"
+        pt={14}
       >
-        Toggle iframe card
-      </Button>
-      <SimpleGrid
-        gridTemplateColumns={
-          lineItems && (isOpen ? { lg: "1fr 3fr 1fr" } : { lg: "3fr 1fr" })
-        }
-        width="full"
-        gap={6}
+        <Heading size="md" color="chakra-subtle-text">
+          Shipping
+        </Heading>
+        <Card
+          w="full"
+          minH="200"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Text fontFamily="monospace" textTransform="uppercase">
+            shipping address form here
+          </Text>
+        </Card>
+        <Heading size="md" color="chakra-subtle-text" mt={8}>
+          Payment
+        </Heading>
+        <Card
+          w="full"
+          minH="200"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Text fontFamily="monospace">IFRAME EMBED GOES HERE</Text>
+        </Card>
+      </VStack>
+      <VStack
+        p={12}
+        alignItems="flex-start"
+        bgColor="gray.100"
+        h="100%"
+        flexGrow="1"
+        maxW="full"
+        minW="container.md"
       >
-        {isOpen && (
-          <Card
-            in={isOpen}
-            as={SlideFade}
-            variant="outline"
-            w="full"
-            rounded="none"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            fontFamily="monospace"
-          >
-            IFRAME EMBED GOES HERE
-          </Card>
-        )}
-        <VStack alignItems="flex-start">
+        <Container w="full" mx={0}>
           <HStack
             w="full"
-            justifyContent="flex-start"
-            alignItems="center"
+            justifyContent="space-between"
             borderBottom="1px solid"
+            pb={4}
+            mb={4}
             borderColor="chakra-border-color"
-            mb={3}
-            pb={3}
-            gap={4}
           >
-            <Heading
-              as="h1"
-              size="xl"
-              flexGrow="1"
-              color="chakra-placeholder-color"
-              textTransform="uppercase"
-              fontWeight="300"
-            >
-              Cart
-            </Heading>
             <Button variant="link" as={RouterLink} to="/products" size="xs">
               Continue shopping
             </Button>
@@ -149,74 +159,70 @@ export const ShoppingCart = (): JSX.Element => {
             )}
           </HStack>
           {lineItems?.length !== 0 ? (
-            <VStack gap={6} w="100%" width="full" alignItems="flex-end">
-              <OcCurrentOrderLineItemList
-                lineItems={lineItems}
-                emptyMessage="Your cart is empty"
-                onChange={handleLineItemChange}
-                editable
-              />
-            </VStack>
+            <OcCurrentOrderLineItemList
+              lineItems={lineItems}
+              emptyMessage="Your cart is empty"
+              onChange={handleLineItemChange}
+              editable
+            />
           ) : (
             <Spinner />
           )}
-        </VStack>
-        {/* Cart Summary  */}
-        {lineItems && (
-          <Card
-            order={{ base: -1, lg: 1 }}
-            variant="outline"
-            w="full"
-            rounded="none"
-          >
-            <CardBody
-              as={Stack}
-              direction={{ base: "row", lg: "column" }}
-              gap={6}
+          <Divider my={4} />
+          {/* Cart Summary  */}
+          {lineItems && (
+            <Card
+              order={{ base: -1, lg: 1 }}
+              variant="outline"
+              borderColor="transparent"
+              bgColor="transparent"
               w="full"
-              alignItems={{ base: "center", lg: "flex-start" }}
+              h="full"
+              p={0}
             >
-              <Hide below="md">
-                <Heading
-                  as="h2"
-                  size="xl"
-                  color="chakra-placeholder-color"
-                  textTransform="uppercase"
-                  fontWeight="300"
-                >
-                  Summary
-                </Heading>
-              </Hide>
-              {order?.Subtotal && (
-                <Heading as="h3" size="md" fontWeight="normal">
-                  Subtotal (
-                  {lineItems
-                    ?.map((li) => li?.Quantity || 0)
-                    .reduce(
-                      (accumulator, currentValue) => accumulator + currentValue,
-                      0
-                    )}{" "}
-                  items):
-                  <Text fontWeight={700} display="inline">
-                    {formatPrice(order.Subtotal)}
-                  </Text>
-                </Heading>
-              )}
-              <Button
-                mt="auto"
-                onClick={submitOrder}
-                size={{ base: "sm", lg: "lg" }}
-                fontSize="lg"
-                colorScheme="primary"
-                w={{ lg: "full" }}
-                _hover={{ textDecoration: "none" }}
+              <CardBody
+                as={Stack}
+                direction={{ base: "row", lg: "column" }}
+                gap={6}
+                w="full"
+                alignItems={{ base: "center", lg: "flex-start" }}
               >
-                Submit Order
-              </Button>
-            </CardBody>
-          </Card>
-        )}
-      </SimpleGrid>
-    </>
+                <>
+                  {order?.Subtotal && (
+                    <HStack w="full" justifyContent="space-between">
+                      <Heading as="h3" size="md" fontWeight="normal">
+                        Subtotal (
+                        {lineItems
+                          ?.map((li) => li?.Quantity || 0)
+                          .reduce(
+                            (accumulator, currentValue) =>
+                              accumulator + currentValue,
+                            0
+                          )}{" "}
+                        items):
+                      </Heading>
+                      <Text fontWeight={700} display="inline">
+                        {formatPrice(order.Subtotal)}
+                      </Text>
+                    </HStack>
+                  )}
+                </>
+                <Button
+                  mt="auto"
+                  onClick={submitOrder}
+                  size={{ base: "sm", lg: "lg" }}
+                  fontSize="lg"
+                  colorScheme="primary"
+                  w={{ lg: "full" }}
+                  _hover={{ textDecoration: "none" }}
+                >
+                  Submit Order
+                </Button>
+              </CardBody>
+            </Card>
+          )}
+        </Container>
+      </VStack>
+    </SimpleGrid>
   );
 };

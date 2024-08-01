@@ -5,7 +5,6 @@ import {
   HStack,
   Heading,
   Icon,
-  IconButton,
   Text,
   VStack,
   useDisclosure,
@@ -16,8 +15,8 @@ import { TbShoppingCart } from "react-icons/tb";
 import {
   Link,
   Outlet,
-  useLocation,
   Link as RouterLink,
+  useLocation,
 } from "react-router-dom";
 import { APP_NAME } from "../constants";
 import { useCurrentUser } from "../hooks/currentUser";
@@ -26,6 +25,7 @@ import LoginModal from "./LoginModal";
 const Layout: FC = () => {
   const { data: user } = useCurrentUser();
   const location = useLocation();
+  const { pathname } = useLocation();
   const { allowAnonymous, isAuthenticated, isLoggedIn, logout } =
     useOrderCloudContext();
 
@@ -48,7 +48,13 @@ const Layout: FC = () => {
         h="100dvh"
         sx={{ "&>*": { width: "full" } }}
       >
-        <GridItem area={"header"} zIndex={2} shadow="md" py={2}>
+        <GridItem
+          area={"header"}
+          zIndex={2}
+          bgColor="chakra-body-bg"
+          shadow="md"
+          py={2}
+        >
           <Container h="100%" maxW="full">
             <HStack h="100%" justify="flex-start" alignItems="center">
               <Heading size="md">{APP_NAME}</Heading>
@@ -93,7 +99,13 @@ const Layout: FC = () => {
             </HStack>
           </Container>
         </GridItem>
-        <Container maxW="container.2xl" py={8} as="main" flex="1">
+        <Container
+          maxW={pathname === "/cart" ? "full" : "container.2xl"}
+          px={pathname === "/cart" ? 0 : "unset"}
+          my={pathname === "/cart" ? 0 : 8}
+          as="main"
+          flex="1"
+        >
           <Outlet />
         </Container>
         <HStack
@@ -101,7 +113,8 @@ const Layout: FC = () => {
           justifyContent="center"
           as="footer"
           py={3}
-          bg="blackAlpha.50"
+          zIndex="12"
+          bg="gray.50"
         >
           <Text fontWeight="normal" fontSize="sm">
             © Sitcore Inc. 2024

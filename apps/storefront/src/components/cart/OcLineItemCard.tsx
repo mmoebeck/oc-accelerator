@@ -89,12 +89,12 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
           bgColor="chakra-subtle-bg"
           aspectRatio="1 / 1"
           objectFit="cover"
-          boxSize="100px"
-          borderTopRadius="md"
+          boxSize="80px"
+          rounded="md"
         >
           {lineItem?.Product?.xp?.Images ? (
             <Image
-              borderTopRadius="md"
+              rounded="md"
               boxSize="full"
               objectFit="cover"
               src={lineItem?.Product?.xp?.Images[0].Url}
@@ -117,7 +117,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
 
         <VStack alignItems="flex-start" gap={3} flexGrow="1">
           <Link as={RouterLink} to={`/products/${lineItem?.Product?.ID}`}>
-            <Text fontSize="xl" display="inline-block" maxW="md">
+            <Text fontSize="md" display="inline-block" maxW="md">
               {lineItem.Product?.Name}
             </Text>
           </Link>
