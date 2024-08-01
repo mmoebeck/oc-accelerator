@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { ChangeEvent, FunctionComponent } from 'react'
+import { ChangeEvent, FunctionComponent, useCallback, useEffect, useState } from 'react'
 
 import {
   NumberDecrementStepper,
@@ -11,11 +11,12 @@ import {
   Select,
   VStack,
 } from '@chakra-ui/react'
-import { PriceSchedule } from 'ordercloud-javascript-sdk'
+import { Me, PriceSchedule, PriceSchedules } from 'ordercloud-javascript-sdk'
 
 interface OcQuantityInputProps {
   controlId: string
   priceSchedule?: PriceSchedule
+  productId?: string;
   label?: string
   disabled?: boolean
   quantity: number
@@ -25,10 +26,28 @@ interface OcQuantityInputProps {
 const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
   controlId,
   priceSchedule,
+  productId,
   disabled,
   quantity,
   onChange,
 }) => {
+
+  const [ps, setPs] = useState(priceSchedule);
+  const [psLoad, setPsLoad] = useState(!!ps);
+
+  const retrievePriceSchedule = useCallback(async (pId:string) => {
+    setPsLoad(true);
+    const response = await Me.GetProduct(pId);
+    setPs(response.PriceSchedule);
+    setPsLoad(false);
+  }, [])
+
+  useEffect(() => {
+    if (productId && !ps && !psLoad) {
+      retrievePriceSchedule(productId)
+    }
+  }, [retrievePriceSchedule, productId, ps, psLoad])
+
   const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
     onChange(Number(e.target.value))
   }
@@ -40,13 +59,13 @@ const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
     onChange(valAsNumber)
   }
 
-  return priceSchedule ? (
+  return ps ? (
     <VStack
       alignItems="flex-start"
       gap={0}
     >
       {/* <FormLabel>{label}</FormLabel> */}
-      {priceSchedule?.RestrictedQuantity ? (
+      {ps?.RestrictedQuantity ? (
         <Select
           maxW="100"
           size="sm"
@@ -55,7 +74,7 @@ const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
           value={quantity}
           onChange={handleSelectChange}
         >
-          {priceSchedule.PriceBreaks?.map((pb) => (
+          {ps.PriceBreaks?.map((pb) => (
             <option
               key={pb.Quantity}
               value={pb.Quantity}
@@ -73,8 +92,8 @@ const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
           onChange={handleNumberInputChange}
           isDisabled={disabled}
           step={1}
-          min={priceSchedule?.MinQuantity || 1}
-          max={priceSchedule?.MaxQuantity || undefined}
+          min={ps?.MinQuantity || 1}
+          max={ps?.MaxQuantity || undefined}
         >
           <NumberInputField />
           <NumberInputStepper>

@@ -36,7 +36,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
 }) => {
   const [quantity, _setQuantity] = useState(lineItem.Quantity);
 
-  const debouncedQuantity = useDebounce(quantity, 300);
+  const debouncedQuantity:number = useDebounce(quantity, 300);
 
   const product = useMemo(() => lineItem.Product, [lineItem]);
   const [isDeliveryInstructionsModalOpen, setIsDeliveryInstructionsModalOpen] =
@@ -44,6 +44,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
 
 
   const updateLineItem = useCallback(async (quantity:number) => {
+    if (lineItem.Quantity === quantity) return;
     const response  = await Cart.PatchLineItem(lineItem.ID!, { Quantity: quantity });
     if (onChange) {
       onChange(response);
@@ -123,7 +124,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
             {product && (
               <OcQuantityInput
                 controlId="addToCart"
-                priceSchedule={lineItem.PriceScheduleID}
+                productId={lineItem.ProductID}
                 quantity={Number(quantity)}
                 onChange={_setQuantity}
               />

@@ -7,7 +7,7 @@ interface OcCurrentOrderLineItemListProps {
   editable?: boolean
   productType?: string
   lineItems?: LineItem[]
-  onChange: (liIndex:number) => (newLineItem:LineItem) => void
+  onChange: (newLineItem:LineItem) => void
 }
 
 const OcCurrentOrderLineItemList: FunctionComponent<OcCurrentOrderLineItemListProps> = ({

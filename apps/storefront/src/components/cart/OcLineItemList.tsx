@@ -11,7 +11,7 @@ interface OcLineItemListProps {
   emptyMessage?: string;
   editable?: boolean;
   lineItems?: LineItem[];
-  onChange: (liIndex:number) => (newLineItem:LineItem) => void
+  onChange: (newLineItem:LineItem) => void
 }
 
 const OcLineItemList: FunctionComponent<OcLineItemListProps> = ({
@@ -38,7 +38,7 @@ const OcLineItemList: FunctionComponent<OcLineItemListProps> = ({
                   ?.filter((li) => li.Product?.xp.Brand == brand)
                   .map((li, i) => (
                     <React.Fragment key={li.ID}>
-                      <OcLineItemCard lineItem={li} editable={editable} onChange={onChange(i)}/>
+                      <OcLineItemCard lineItem={li} editable={editable} onChange={onChange}/>
                     </React.Fragment>
                   ))}
               </CardBody>

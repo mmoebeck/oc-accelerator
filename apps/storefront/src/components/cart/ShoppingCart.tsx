@@ -15,7 +15,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { Cart, LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import formatPrice from "../../utils/formatPrice";
 import OcCurrentOrderLineItemList from "./OcCurrentOrderLineItemList";
@@ -62,28 +62,10 @@ export const ShoppingCart = (): JSX.Element => {
     getLineItems();
   }, [order, getLineItems]);
 
-  // Group line items by product ID and sum their quantities
-  const mergedLineItems = useMemo(() => {
-    const itemMap = new Map();
-
-    lineItems?.forEach((item) => {
-      const { ProductID } = item;
-      if (itemMap.has(ProductID)) {
-        itemMap.get(ProductID).Quantity += item.Quantity;
-      } else {
-        // Otherwise, add it to the map
-        itemMap.set(ProductID, { ...item });
-      }
-    });
-
-    // Convert the map back to an array
-    return Array.from(itemMap.values());
-  }, [lineItems]);
-
-  const handleLineItemChange = useCallback((liIndex:number) => (newLi:LineItem) => {
+  const handleLineItemChange = useCallback((newLi:LineItem) => {
     setLineItems(items => {
-      return items?.map((li, i) => {
-        if (i === liIndex) { 
+      return items?.map((li) => {
+        if (li.ID === newLi.ID) { 
           return newLi
         }
         return li;
@@ -116,7 +98,7 @@ export const ShoppingCart = (): JSX.Element => {
           >
             Cart
           </Heading>
-          {mergedLineItems.length !== 0 && (
+          {lineItems?.length !== 0 && (
             <Button
               type="button"
               onClick={deleteOrder}
@@ -128,10 +110,10 @@ export const ShoppingCart = (): JSX.Element => {
             </Button>
           )}
         </HStack>
-        {mergedLineItems.length !== 0 ? (
+        {lineItems?.length !== 0 ? (
           <VStack gap={6} w="100%" width="full" alignItems="flex-end">
             <OcCurrentOrderLineItemList
-              lineItems={mergedLineItems}
+              lineItems={lineItems}
               emptyMessage="Your cart is empty"
               onChange={handleLineItemChange}
               editable
@@ -172,7 +154,7 @@ export const ShoppingCart = (): JSX.Element => {
               <Heading as="h3" size="md" fontWeight="normal">
                 Subtotal (
                 {lineItems
-                  ?.map((li) => li?.Quantity)
+                  ?.map((li) => li?.Quantity || 0)
                   .reduce(
                     (accumulator, currentValue) => accumulator + currentValue,
                     0
