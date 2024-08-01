@@ -41,7 +41,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
   // const { product, variants } = useOcProductDetail(productId);
   const [addingToCart, setAddingToCart] = useState(false);
   const [quantity, setQuantity] = useState(
-    product ? product.PriceSchedule.MinQuantity : 1
+    product?.PriceSchedule?.MinQuantity ?? 1
   );
 
   const getProduct = useCallback(async ()=> {
@@ -160,7 +160,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
           </VStack>
         )} */}
         <Text fontSize="xl">
-          {formatPrice(product.PriceSchedule?.PriceBreaks[0]?.Price)}
+          {formatPrice(product?.PriceSchedule?.PriceBreaks?.[0].Price)}
         </Text>
         <HStack alignItems="center" gap={4}>
           <Button
@@ -177,9 +177,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
             quantity={quantity}
             onChange={setQuantity}
           />
-          {product.Inventory.Enabled && (
+          {product.Inventory?.Enabled && (
             <Text>
-              Quantity Available: {product.Inventory.QuantityAvailable}
+              Quantity Available: {product.Inventory?.QuantityAvailable}
             </Text>
           )}
         </HStack>

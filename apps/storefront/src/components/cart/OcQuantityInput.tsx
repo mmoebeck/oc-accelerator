@@ -15,7 +15,7 @@ import { PriceSchedule } from 'ordercloud-javascript-sdk'
 
 interface OcQuantityInputProps {
   controlId: string
-  priceSchedule: PriceSchedule
+  priceSchedule?: PriceSchedule
   label?: string
   disabled?: boolean
   quantity: number
@@ -40,7 +40,7 @@ const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
     onChange(valAsNumber)
   }
 
-  return (
+  return priceSchedule ? (
     <VStack
       alignItems="flex-start"
       gap={0}
@@ -55,7 +55,7 @@ const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
           value={quantity}
           onChange={handleSelectChange}
         >
-          {priceSchedule.PriceBreaks.map((pb) => (
+          {priceSchedule.PriceBreaks?.map((pb) => (
             <option
               key={pb.Quantity}
               value={pb.Quantity}
@@ -84,7 +84,7 @@ const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
         </NumberInput>
       )}
     </VStack>
-  )
+  ) : null;
 }
 
 export default OcQuantityInput
