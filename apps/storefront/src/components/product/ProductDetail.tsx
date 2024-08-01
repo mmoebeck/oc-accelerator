@@ -9,6 +9,7 @@ import {
   Icon,
   Image,
   SimpleGrid,
+  Spinner,
   Text,
   useToast,
   VStack,
@@ -43,6 +44,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
   const [activeRecordId, setActiveRecordId] = useState<string>();
   const [inventoryRecords, setInventoryRecords] =
     useState<RequiredDeep<ListPage<InventoryRecord>>>();
+  const [loading, setLoading] = useState<boolean>(true);
   const [addingToCart, setAddingToCart] = useState(false);
   const [quantity, setQuantity] = useState(
     product?.PriceSchedule?.MinQuantity ?? 1
@@ -50,8 +52,15 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
   const outOfStock = product?.Inventory?.QuantityAvailable === 0;
 
   const getProduct = useCallback(async () => {
-    const result = await Me.GetProduct(productId);
-    setProduct(result);
+    setLoading(true);
+    try {
+      const result = await Me.GetProduct(productId);
+      setProduct(result);
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+    }
   }, [productId]);
 
   const getProductInventory = useCallback(async () => {
@@ -126,7 +135,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
     return <div>Product not found for ID: {productId}</div>;
   }
 
-  return renderProductDetail ? (
+  return loading ? (<Spinner/>) : product ? (renderProductDetail ? (
     renderProductDetail(product)
   ) : (
     <SimpleGrid gridTemplateColumns={{ lg: "1fr 2fr" }} gap={12}>
@@ -245,6 +254,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
         )}
       </VStack>
     </SimpleGrid>
+  )) : (
+    <div>Product not found for ID: {productId}</div>
   );
 };
 
